@@ -2,5 +2,10 @@
 <resources>
 
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+
+    </style>
+
+    <style name="AppTheme.Details" parent="Theme.AppCompat.Light.NoActionBar">
+
     </style>
 </resources>

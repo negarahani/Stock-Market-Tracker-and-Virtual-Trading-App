@@ -16,6 +16,11 @@ public class FavoriteStock {
         this.changePercent = changePercent;
     }
 
+    //constructor for when we don't care about paramters other than ticker and name
+    public FavoriteStock(String tickerSymbol, String companyName) {
+        this(tickerSymbol, companyName, null, null, null);
+    }
+
     @Override
     public String toString() {
         return "FavoriteStock{" +

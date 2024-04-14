@@ -1,6 +1,8 @@
 package com.example.myapplication;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -26,6 +28,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -48,6 +51,10 @@ public class MainActivity extends AppCompatActivity{
 
     RecyclerView recyclerView;
     List<FavoriteStock> favoriteStocks;
+
+    //related to shared preferences
+    private static final String PREFS_NAME = "MyFavoriteStocksPrefs";
+    private static final String KEY_FAVORITE_STOCKS = "favoriteStocks";
 
 
     @Override
@@ -220,6 +227,9 @@ public class MainActivity extends AppCompatActivity{
                                     Log.d("FavoriteStocks", "Favorite Stock: " + stock.toString());
                                 }
 
+                                //call the method to save the favorite stocks array to shared preferences
+                                saveFavoriteStocks(favoriteStocks);
+
                                 FavoriteStockSection favoriteStockSection = new FavoriteStockSection(favoriteStocks, sectionAdapter.getSectionCount());
                                 // Add the section to the SectionedRecyclerViewAdapter
                                 sectionAdapter.addSection(favoriteStockSection);
@@ -360,5 +370,19 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
+    // Method to save favorite stocks to SharedPreferences
+    private void saveFavoriteStocks(List<FavoriteStock> favoriteStocks) {
+        //Getting SharedPreferences instance
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        //Converting favoriteStocks list to JSON String
+        Gson gson = new Gson();
+        String json = gson.toJson(favoriteStocks);
+
+        //Saving JSON String to SharedPreferences
+        editor.putString(KEY_FAVORITE_STOCKS, json);
+        editor.apply();
+    }
 
 }

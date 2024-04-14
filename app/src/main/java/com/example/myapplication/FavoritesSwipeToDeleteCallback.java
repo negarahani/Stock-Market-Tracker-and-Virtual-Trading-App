@@ -1,6 +1,7 @@
 package com.example.myapplication;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -20,6 +21,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.myapplication.FavoriteStockSection;
+import com.google.gson.Gson;
 
 import java.util.List;
 
@@ -35,6 +37,9 @@ public class FavoritesSwipeToDeleteCallback extends ItemTouchHelper.Callback {
     private Drawable deleteDrawable;
     private final int intrinsicWidth;
     private final int intrinsicHeight;
+
+    private static final String PREFS_NAME = "MyFavoriteStocksPrefs";
+    private static final String KEY_FAVORITE_STOCKS = "favoriteStocks";
 
     public FavoritesSwipeToDeleteCallback(Context context, SectionedRecyclerViewAdapter adapter, List<FavoriteStock> favoriteStocks) {
         mAdapter = adapter;
@@ -99,10 +104,10 @@ public class FavoritesSwipeToDeleteCallback extends ItemTouchHelper.Callback {
                     public void onResponse(String response) {
                         // Handle successful response
                         Log.d("FavoriteStock", "Favorite stock removed successfully: " + ticker);
-                        // Remove the favorite stock from the local list
-
-                        removeFromFavoriteStocks(ticker);
+                        //no need for updating mFavorites because mFavoriteStocks is a reference to an array that is already updated in MainActivity!
                         Log.d("FavoriteStock", "Favorite Stocks array after delete:" + mFavoriteStocks);
+
+                        updateSharedPreferences();
                     }
                 }, new Response.ErrorListener() {
             @Override
@@ -117,18 +122,21 @@ public class FavoritesSwipeToDeleteCallback extends ItemTouchHelper.Callback {
 
     }
 
-    // Method to remove the favorite stock from the local list
-    private void removeFromFavoriteStocks(String ticker) {
-        if (mFavoriteStocks != null) {
-            for (FavoriteStock stock : mFavoriteStocks) {
-                if (stock.getTickerSymbol().equals(ticker)) {
-                    mFavoriteStocks.remove(stock);
-                    mAdapter.notifyDataSetChanged(); // Notify adapter about the data change
-                    break;
-                }
-            }
 
-        }
+
+    private void updateSharedPreferences() {
+
+        Gson gson = new Gson();
+        String json = gson.toJson(mFavoriteStocks);
+
+        //Getting SharedPreferences instance
+        SharedPreferences sharedPreferences = mContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        //Saving the JSON string to shared preferences
+        editor.putString(KEY_FAVORITE_STOCKS, json);
+        editor.apply();
+        Log.d("FavoriteStock", "SharedPreferences got updated");
     }
 
     @Override

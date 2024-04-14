@@ -7,6 +7,10 @@
     android:layout_height="match_parent"
     tools:context=".DetailsActivity">
 
+    <include
+        android:id="@+id/details_toolbar"
+        layout="@layout/custom_toolbar" />
+
     <TableLayout
         android:layout_width="414dp"
         android:layout_height="121dp"
