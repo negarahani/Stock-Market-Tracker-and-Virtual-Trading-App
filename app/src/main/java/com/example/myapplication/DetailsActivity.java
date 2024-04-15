@@ -51,7 +51,9 @@ import android.util.DisplayMetrics;
 public class DetailsActivity extends AppCompatActivity {
 
     private static final String BASE_URL = "http://10.0.2.2:8080";
+    private Double curBalance;
     private List<FavoriteStock> myFavoriteStocks = new ArrayList<>(); //you may change this later!
+    private List<PortfolioStock> myPortfolioStocks = new ArrayList<>(); //you may change this later!
     private String curTicker;
     private String curCompanyName;
     private Double curPrice;
@@ -59,10 +61,20 @@ public class DetailsActivity extends AppCompatActivity {
 
     private static final String PREFS_NAME = "MyFavoriteStocksPrefs";
     private static final String KEY_FAVORITE_STOCKS = "favoriteStocks";
+    private static final String PREFS_NAME_PORTFOLIO = "MyPortfolioStocksPrefs";
+    private static final String KEY_PORTFOLIO_STOCKS = "portfolioStocks";
+
     private Button tradeButton;
 
+    //related to portfolio
     Integer quantityToBuy = 0;
     Double totalCostToBuy = 0.00;
+
+    Integer curQuantity = 0;
+    Double curAvgCostShare = 0.00;
+    Double curTotalCost = 0.00;
+    Double curChange_Trade = 0.00;
+    Double curMarketValue = 0.00;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -93,9 +105,12 @@ public class DetailsActivity extends AppCompatActivity {
 
 
         /************** other methods to get data from backend *************/
-        initStarButton(ticker);
+        getBalanceData();
         getCompanyData(ticker);
         getQuoteData(ticker);
+
+        initStarButton(ticker);
+        initTradeSection(ticker);
 
         /******* set up the star button onClick listener *************/
         ImageButton starButton = findViewById(R.id.star_icon);
@@ -150,7 +165,7 @@ public class DetailsActivity extends AppCompatActivity {
                     tradeInputGuideText.setText(quantityToBuy + "*$" + curPrice + "/share = " + totalCostToBuy);
 
                     TextView tradeBalanceText = dialog.findViewById(R.id.tradeBalanceText);
-                    tradeBalanceText.setText(" to buy " + curTicker);
+                    tradeBalanceText.setText("$"+ curBalance +" to buy " + curTicker);
 
                     editText.addTextChangedListener(new TextWatcher() {
                         @Override
@@ -198,37 +213,156 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
 
-    private void initStarButton(String tickerSymbol){
-        myFavoriteStocks = loadFavoriteStocks();
-        Log.d("DetailsActivity", "FavoriteStocks list retreived from shared preference is: " + myFavoriteStocks);
 
-        isInFavorites = false;
-        for (FavoriteStock stock : myFavoriteStocks) {
+    private void initTradeSection(String tickerSymbol){
+        myPortfolioStocks = loadPortfolioStocks();
+        Log.d("DetailsActivity", "list of portfolio stocks retrieved from shared preferences is: " + myPortfolioStocks);
+
+        for (PortfolioStock stock : myPortfolioStocks) {
             if (stock.getTickerSymbol().equals(curTicker)) {
-                isInFavorites = true;
-                break;
+
+                curQuantity = stock.getQuantity();
+                curTotalCost = stock.getTotalCost();
+                curAvgCostShare = curTotalCost / curQuantity;
+                curChange_Trade = stock.getChange();
+                curMarketValue = stock.getMarketValue();
+
             }
+
+
         }
-        if (isInFavorites) {
-            ImageButton starButton = findViewById(R.id.star_icon);
-            starButton.setImageResource(R.drawable.full_star);
-        } else {
-            ImageButton starButton = findViewById(R.id.star_icon);
-            starButton.setImageResource(R.drawable.star_border);
-        }
+
+        TextView sharesOwnedText = findViewById(R.id.sharesOwnedText);
+        TextView avgCostShareText = findViewById(R.id.avgCostShareText);
+        TextView totalCostText = findViewById(R.id.totalCostText);
+        TextView changeTextDetails = findViewById(R.id.changeTextTrade);
+        TextView marketValueText = findViewById(R.id.marketValueText);
+
+        sharesOwnedText.setText(String.valueOf(curQuantity));
+        avgCostShareText.setText(String.format("%.2f",curAvgCostShare));
+        totalCostText.setText(String.format("%.2f",curTotalCost));
+        changeTextDetails.setText(String.format("%.2f", curChange_Trade));
+        marketValueText.setText(String.format("%.2f", curMarketValue));
+
     }
 
-    //Method to get favorite stocks from SharedPreferences
-    private List<FavoriteStock> loadFavoriteStocks() {
+    //Method to get portfolio stocks from SharedPreferences
+    private List<PortfolioStock> loadPortfolioStocks() {
         //Getting SharedPreferences instance
-        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME_PORTFOLIO, Context.MODE_PRIVATE);
 
-        String json = sharedPreferences.getString(KEY_FAVORITE_STOCKS, null);
+        String json = sharedPreferences.getString(KEY_PORTFOLIO_STOCKS, null);
 
         // converting JSON to list of favorite stocks
         Gson gson = new Gson();
-        Type type = new TypeToken<List<FavoriteStock>>() {}.getType();
+        Type type = new TypeToken<List<PortfolioStock>>() {}.getType();
         return gson.fromJson(json, type);
+    }
+
+    private void getBalanceData() {
+        String balanceUrl = BASE_URL + "/api/wallet/getBalance";
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, balanceUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray jsonArray = new JSONArray(response);
+                            JSONObject jsonObject = jsonArray.getJSONObject(0);
+                            curBalance = jsonObject.getDouble("cash_balance");
+
+                        } catch (JSONException e) {
+                            String errorMessage = "Error parsing JSON: " + e.getMessage();
+
+                            Log.e("MainActivity", errorMessage);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                String errorMessage = "Error fetching balance: " + error.getMessage();
+                Log.d("MainActivity", errorMessage);
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+    private void updateBalanceData(Double newBalance) {
+        String updateBalanceUrl = BASE_URL + "/api/wallet/updateBalance/";
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("cash_balance", newBalance);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, updateBalanceUrl, requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        Log.d("DetailsActivity", "Balance updated successfully");
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handle error response
+                Log.e("DetailsActivity", "Error updating balance: " + error.getMessage());
+            }
+        });
+
+        queue.add(jsonObjectRequest);
+    }
+
+    private void updatePortfolioItem(String tickerSymbol , String companyName, Integer stockQuantity, Double totalCost){
+        String updatePortfolioUrl = BASE_URL + "api/portfolio/updatePortfolio";
+        RequestQueue queue = Volley.newRequestQueue(this);
+        JSONObject requestBody = new JSONObject();
+        try {
+            requestBody.put("ticker", tickerSymbol);
+            requestBody.put("company_name", companyName);
+            requestBody.put("quantity", stockQuantity);
+            requestBody.put("total_cost", totalCost);
+
+        } catch (JSONException e){
+            e.printStackTrace();
+        }
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, updatePortfolioUrl, requestBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+                        Log.d("DetailsActivity", "Portfolio Item for " + tickerSymbol + " updated successfully");
+                        //updating the local list? maybe not needed!!
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Log.e("DetailsActivity", "Error updating portfolio item: " + volleyError.getMessage());
+            }
+        });
+        queue.add(jsonObjectRequest);
+    }
+
+    private void deletePortfolioItem(String tickerSymbol){
+        String deletePortfolioUrl = BASE_URL + "api/portfolio/deletePortfolio/" + tickerSymbol;
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.DELETE, deletePortfolioUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String s) {
+                        Log.d("DetailsActivity", "Portfolio item " + tickerSymbol + " removed successfully");
+                        // removing item from the local list? probably not needed
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Log.e("DetailsActivity", "Error deleting portfolio item: " + volleyError.getMessage());
+            }
+        });
+        queue.add(stringRequest);
     }
 
     private void getCompanyData(String tickerSymbol) {
@@ -322,7 +456,39 @@ public class DetailsActivity extends AppCompatActivity {
         });
         queue.add(stringRequest);
     }
+    /*********************** related to favorite stocks *************************/
+    private void initStarButton(String tickerSymbol){
+        myFavoriteStocks = loadFavoriteStocks();
+        Log.d("DetailsActivity", "FavoriteStocks list retreived from shared preference is: " + myFavoriteStocks);
 
+        isInFavorites = false;
+        for (FavoriteStock stock : myFavoriteStocks) {
+            if (stock.getTickerSymbol().equals(curTicker)) {
+                isInFavorites = true;
+                break;
+            }
+        }
+        if (isInFavorites) {
+            ImageButton starButton = findViewById(R.id.star_icon);
+            starButton.setImageResource(R.drawable.full_star);
+        } else {
+            ImageButton starButton = findViewById(R.id.star_icon);
+            starButton.setImageResource(R.drawable.star_border);
+        }
+    }
+
+    //Method to get favorite stocks from SharedPreferences
+    private List<FavoriteStock> loadFavoriteStocks() {
+        //Getting SharedPreferences instance
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+
+        String json = sharedPreferences.getString(KEY_FAVORITE_STOCKS, null);
+
+        // converting JSON to list of favorite stocks
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<FavoriteStock>>() {}.getType();
+        return gson.fromJson(json, type);
+    }
     private void addFavoriteStock(String ticker) {
         String addFavoritesUrl = BASE_URL + "/api/favorites/addFavorites/";
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -392,4 +558,5 @@ public class DetailsActivity extends AppCompatActivity {
         });
         queue.add(stringRequest);
     }
+    /********************* End of favorite stocks methods *******************************/
 }

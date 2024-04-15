@@ -62,6 +62,9 @@ public class MainActivity extends AppCompatActivity{
     //related to shared preferences of Favorites
     private static final String PREFS_NAME = "MyFavoriteStocksPrefs";
     private static final String KEY_FAVORITE_STOCKS = "favoriteStocks";
+    //related to shared preferences of Portfolio
+    private static final String PREFS_NAME_PORTFOLIO = "MyPortfolioStocksPrefs";
+    private static final String KEY_PORTFOLIO_STOCKS = "portfolioStocks";
 
 
     @Override
@@ -245,7 +248,7 @@ public class MainActivity extends AppCompatActivity{
                                 }
 
                                 // //call the method to save the portfolio stocks array to shared preferences
-                                // savePortfolioStocks(portfolioStocks);
+                                savePortfolioStocks(portfolioStocks);
 
                                 PortfolioStockSection portfolioStockSection = new PortfolioStockSection(portfolioStocks, sectionAdapter_portfolio.getSectionCount());
                                 // Add the section to the SectionedRecyclerViewAdapter
@@ -371,6 +374,21 @@ public class MainActivity extends AppCompatActivity{
 
     public interface ParsePortfolioDataCallback {
         void onParsePortfolioDataCompleted(List<PortfolioStock> portfolioStocks);
+    }
+
+    // Method to save portfolio stocks to SharedPreferences
+    private void savePortfolioStocks(List<PortfolioStock> portfolioStocks) {
+        //Getting SharedPreferences instance
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME_PORTFOLIO, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+        //Converting portfolioStocks list to JSON String
+        Gson gson = new Gson();
+        String json = gson.toJson(portfolioStocks);
+
+        //Saving JSON String to SharedPreferences
+        editor.putString(KEY_PORTFOLIO_STOCKS, json);
+        editor.apply();
     }
 
     /********************* Getting Favorites Data Section ****************************/
