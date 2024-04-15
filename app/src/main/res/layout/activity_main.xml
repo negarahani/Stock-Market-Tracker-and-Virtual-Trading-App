@@ -15,10 +15,10 @@
         android:text="Hello World!"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintHorizontal_bias="0.049"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.144" />
+        app:layout_constraintVertical_bias="0.008" />
 
     <TextView
         android:id="@+id/search_text"
@@ -30,30 +30,57 @@
         app:layout_constraintBottom_toTopOf="@+id/balanceText"
         app:layout_constraintStart_toStartOf="parent" />
 
-
     <TextView
         android:id="@+id/headerText"
         android:layout_width="match_parent"
         android:layout_height="50dp"
-        android:layout_marginTop="172dp"
+        android:layout_marginTop="48dp"
+        android:background="@android:color/darker_gray"
+        android:padding="16dp"
+        android:text="Portfolio"
+        android:textColor="@android:color/black"
+        android:textSize="15sp"
+        app:layout_constraintStart_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+
+        android:id="@+id/portfolioRecyclerView"
+        android:layout_width="403dp"
+        android:layout_height="401dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.285" />
+
+
+    <TextView
+        android:id="@+id/headerText2"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_marginTop="416dp"
         android:background="@android:color/darker_gray"
         android:padding="16dp"
         android:text="Favorites"
         android:textColor="@android:color/black"
         android:textSize="15sp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.392" />
 
     <androidx.recyclerview.widget.RecyclerView
 
         android:id="@+id/favoritesRecyclerView"
-        android:layout_width="400dp"
-        android:layout_height="500dp"
+        android:layout_width="402dp"
+        android:layout_height="157dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.909" />
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

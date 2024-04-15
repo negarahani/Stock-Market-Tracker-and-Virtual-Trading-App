@@ -47,12 +47,19 @@ public class MainActivity extends AppCompatActivity{
 
     private static final String BASE_URL = "http://10.0.2.2:8080";
     AutoCompleteTextView autoCompleteTextView;
-    private SectionedRecyclerViewAdapter sectionAdapter;
 
+    //related to Portfolio
+    private SectionedRecyclerViewAdapter sectionAdapter_portfolio;
+    RecyclerView recyclerView_portfolio;
+    List<PortfolioStock> portfolioStocks;
+
+    //related to Favorites
+    private SectionedRecyclerViewAdapter sectionAdapter;
     RecyclerView recyclerView;
     List<FavoriteStock> favoriteStocks;
 
-    //related to shared preferences
+
+    //related to shared preferences of Favorites
     private static final String PREFS_NAME = "MyFavoriteStocksPrefs";
     private static final String KEY_FAVORITE_STOCKS = "favoriteStocks";
 
@@ -63,11 +70,18 @@ public class MainActivity extends AppCompatActivity{
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
-        // Initialize RecyclerView and SectionedRecyclerViewAdapter
+        // Initialize RecyclerView and SectionedRecyclerViewAdapter for Portfolio Section
+        recyclerView_portfolio = findViewById(R.id.portfolioRecyclerView);
+        sectionAdapter_portfolio = new SectionedRecyclerViewAdapter();
+        recyclerView_portfolio.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView_portfolio.setAdapter(sectionAdapter_portfolio);
+
+        // Initialize RecyclerView and SectionedRecyclerViewAdapter for Favorites Section
         recyclerView = findViewById(R.id.favoritesRecyclerView);
         sectionAdapter = new SectionedRecyclerViewAdapter();
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(sectionAdapter);
+
 
     }
 
@@ -77,6 +91,7 @@ public class MainActivity extends AppCompatActivity{
         super.onResume();
         getAPIBalance();
         getFavoriteStocks();
+        getPortfolioStocks();
     }
 
     @Override
@@ -206,6 +221,159 @@ public class MainActivity extends AppCompatActivity{
         queue.add(stringRequest);
     }
 
+    /********************* Getting Portfolio Data Section ****************************/
+    private void getPortfolioStocks(){
+        String portfolioUrl = BASE_URL + "/api/portfolio/getPortfolio";
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        portfolioStocks = new ArrayList<>(); // Clear the previous results
+        // Clear the adapter before fetching new data
+        sectionAdapter_portfolio.removeAllSections();
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, portfolioUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response){
+                        Log.d("PortfolioStocks", "response is: " + response);
+
+                        parsePortfolioData(response, new ParsePortfolioDataCallback() {
+                            @Override
+                            public void onParsePortfolioDataCompleted(List<PortfolioStock> portfolioStocks) {
+
+                                for (PortfolioStock stock : portfolioStocks) {
+                                    Log.d("PortfolioStocks", "Portfolio Stock: " + stock.toString());
+                                }
+
+                                // //call the method to save the portfolio stocks array to shared preferences
+                                // savePortfolioStocks(portfolioStocks);
+
+                                PortfolioStockSection portfolioStockSection = new PortfolioStockSection(portfolioStocks, sectionAdapter_portfolio.getSectionCount());
+                                // Add the section to the SectionedRecyclerViewAdapter
+                                sectionAdapter_portfolio.addSection(portfolioStockSection);
+                                // Notify adapter about the data change
+                                sectionAdapter_portfolio.notifyDataSetChanged();
+
+
+
+
+                            }
+                        });
+
+                    }
+                },
+                new Response.ErrorListener(){
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        String errorMessage = "Error fetching portfolio stocks" + error.getMessage();
+                        Log.d("PortfolioStocks", errorMessage);
+
+                    }
+                });
+
+        // Add the request to the RequestQueue
+        queue.add(stringRequest);
+    }
+
+    private void parsePortfolioData(String response, ParsePortfolioDataCallback callback) {
+        try {
+            JSONArray jsonArray = new JSONArray(response);
+            portfolioStocks = new ArrayList<>();
+
+            // Keep track of the number of responses received
+            AtomicInteger responsesReceived = new AtomicInteger(0);
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String tickerSymbol = jsonObject.getString("ticker");
+                Integer quantity = jsonObject.getInt("quantity");
+                Double totalCost = jsonObject.getDouble("total_cost");
+
+                getQuoteData_Portfolio(tickerSymbol, new QuoteDataCallback_Portfolio() {
+                    @Override
+                    public void onQuoteDataCompleted_Portfolio(Map<String, Double> quoteData_Portfolio) {
+                        if (quoteData_Portfolio != null) {
+                            double currentPrice = quoteData_Portfolio.get("current_price");
+
+                            //calculating other values and adding to portfolio
+                            if (quantity != 0 && totalCost != 0) {
+                                double marketValue = quantity * currentPrice;
+                                double avgPriceOfStock = totalCost / quantity;
+                                double changeInPriceFromTotalCost = (currentPrice - avgPriceOfStock) * quantity;
+                                double changeInPriceFromTotalCostPercent = (changeInPriceFromTotalCost / totalCost) * 100;
+
+
+                                PortfolioStock portfolioStock = new PortfolioStock(tickerSymbol, quantity, totalCost, marketValue, changeInPriceFromTotalCost, changeInPriceFromTotalCostPercent);
+                                portfolioStocks.add(portfolioStock);
+                            }
+
+                            // Check if all responses have been received
+                            if (responsesReceived.incrementAndGet() == jsonArray.length()) {
+                                // All portfolio stocks have been processed
+                                callback.onParsePortfolioDataCompleted(portfolioStocks);
+                            }
+                        } else {
+                            Log.e("PortfolioStocks", "Quote data is null");
+
+                            // Still increment the counter even if there's an error to ensure completion
+                            if (responsesReceived.incrementAndGet() == jsonArray.length()) {
+                                // All portfolio stocks have been processed
+                                callback.onParsePortfolioDataCompleted(portfolioStocks);
+                            }
+                        }
+                    }
+                });
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    private void getQuoteData_Portfolio(String ticker, QuoteDataCallback_Portfolio callback) {
+        Log.d("PortfolioStocks", "getQuoteData_Portfolio executed");
+        Log.d("PortfolioStocks", "current ticker is " + ticker);
+
+        String quoteUrl = BASE_URL + "/search-quote/" + ticker;
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, quoteUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject jsonObject = new JSONObject(response);
+                            double curPrice = jsonObject.getDouble("c");
+
+                            Map<String, Double> quoteData_Portfolio = new HashMap<>();
+                            quoteData_Portfolio.put("current_price", curPrice);
+
+                            callback.onQuoteDataCompleted_Portfolio(quoteData_Portfolio);
+
+                        } catch (JSONException e) {
+                            String errorMessage = "Error parsing quote data: " + e.getMessage();
+                            Log.e("PortfolioStocks", errorMessage);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                String errorMessage = "Error fetching quoteData: " + error.getMessage();
+                Log.d("PortfolioStocks", errorMessage);
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+
+
+    public interface QuoteDataCallback_Portfolio {
+        void onQuoteDataCompleted_Portfolio(Map<String, Double> quoteData_Portfolio);
+    }
+
+    public interface ParsePortfolioDataCallback {
+        void onParsePortfolioDataCompleted(List<PortfolioStock> portfolioStocks);
+    }
+
+    /********************* Getting Favorites Data Section ****************************/
     private void getFavoriteStocks() {
         String favoritesUrl = BASE_URL + "/api/favorites/getFavorites";
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -222,7 +390,7 @@ public class MainActivity extends AppCompatActivity{
                         parseFavoritesData(response, new ParseFavoritesDataCallback() {
                             @Override
                             public void onParseFavoritesDataCompleted(List<FavoriteStock> favoriteStocks) {
-                                // Handle the completion of parsing favorite stocks here
+
                                 for (FavoriteStock stock : favoriteStocks) {
                                     Log.d("FavoriteStocks", "Favorite Stock: " + stock.toString());
                                 }
@@ -261,21 +429,6 @@ public class MainActivity extends AppCompatActivity{
         queue.add(stringRequest);
     }
 
-    public void onItemMoved(int fromPosition, int toPosition) {
-        Log.d("FavoriteStocks", "onItemMoved triggered");
-
-        // Get the favorite stock list from the adapter
-        FavoriteStockSection section = (FavoriteStockSection) sectionAdapter.getSection(0);
-        List<FavoriteStock> favoriteStocks = section.getData();
-
-        Log.d("FavoriteStocks", "Before swap: " + favoriteStocks);
-        // Swap the positions of the items in the list
-        Collections.swap(favoriteStocks, fromPosition, toPosition);
-        Log.d("FavoriteStocks", "After swap: " + favoriteStocks);
-
-        // Notify the adapter about the data change
-        sectionAdapter.notifyItemMoved(fromPosition, toPosition);
-    }
 
     private void parseFavoritesData(String response, ParseFavoritesDataCallback callback) {
         try {
@@ -348,14 +501,14 @@ public class MainActivity extends AppCompatActivity{
 
                         } catch (JSONException e) {
                             String errorMessage = "Error parsing quote data: " + e.getMessage();
-                            Log.e("DetailsActivity", errorMessage);
+                            Log.e("FavoriteStocks", errorMessage);
                         }
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                String errorMessage = "Error fetching companyData: " + error.getMessage();
-                Log.d("DetailsActivity", errorMessage);
+                String errorMessage = "Error fetching quoteData: " + error.getMessage();
+                Log.d("FavoriteStocks", errorMessage);
             }
         });
         queue.add(stringRequest);
@@ -367,6 +520,22 @@ public class MainActivity extends AppCompatActivity{
 
     public interface ParseFavoritesDataCallback {
         void onParseFavoritesDataCompleted(List<FavoriteStock> favoriteStocks);
+    }
+
+    public void onItemMoved(int fromPosition, int toPosition) {
+        Log.d("FavoriteStocks", "onItemMoved triggered");
+
+        // Get the favorite stock list from the adapter
+        FavoriteStockSection section = (FavoriteStockSection) sectionAdapter.getSection(0);
+        List<FavoriteStock> favoriteStocks = section.getData();
+
+        Log.d("FavoriteStocks", "Before swap: " + favoriteStocks);
+        // Swap the positions of the items in the list
+        Collections.swap(favoriteStocks, fromPosition, toPosition);
+        Log.d("FavoriteStocks", "After swap: " + favoriteStocks);
+
+        // Notify the adapter about the data change
+        sectionAdapter.notifyItemMoved(fromPosition, toPosition);
     }
 
 
@@ -384,5 +553,5 @@ public class MainActivity extends AppCompatActivity{
         editor.putString(KEY_FAVORITE_STOCKS, json);
         editor.apply();
     }
-
+    /********************* End of Getting Favorites Data Section ****************************/
 }
