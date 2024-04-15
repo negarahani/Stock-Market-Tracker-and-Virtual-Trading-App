@@ -12,15 +12,16 @@
         layout="@layout/custom_toolbar" />
 
     <TableLayout
-        android:layout_width="414dp"
-        android:layout_height="121dp"
-        android:layout_marginBottom="612dp"
+        android:id="@+id/tableLayout"
+        android:layout_width="409dp"
+        android:layout_height="92dp"
+        android:layout_marginBottom="640dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/company_ticker"
@@ -37,7 +38,7 @@
 
         <TableRow
             android:layout_width="match_parent"
-            android:layout_height="match_parent" >
+            android:layout_height="match_parent">
 
             <TextView
                 android:id="@+id/company_name"
@@ -53,4 +54,122 @@
         </TableRow>
 
     </TableLayout>
+
+    <TextView
+        android:id="@+id/Portfolio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="23dp"
+        android:layout_marginTop="10dp"
+        android:text="Portfolio"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
+
+    <TableLayout
+        android:id="@+id/tableLayout2"
+        android:layout_width="278dp"
+        android:layout_height="97dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/Portfolio">
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/sharesOwnedTitle"
+                android:layout_width="163dp"
+                android:layout_height="wrap_content"
+                android:text="Shares Owned: " />
+
+            <TextView
+                android:id="@+id/sharesOwnedText"
+                android:layout_width="114dp"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/avgCostShareTitle"
+                android:layout_width="163dp"
+                android:layout_height="wrap_content"
+                android:text="Avg. Cost / Share: " />
+
+            <TextView
+                android:id="@+id/avgCostShareText"
+                android:layout_width="114dp"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/totalCostTitle"
+                android:layout_width="163dp"
+                android:layout_height="wrap_content"
+                android:text="Total Cost: " />
+
+            <TextView
+                android:id="@+id/totalCostText"
+                android:layout_width="114dp"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/changeTitleDetails"
+                android:layout_width="163dp"
+                android:layout_height="wrap_content"
+                android:text="Change: " />
+
+            <TextView
+                android:id="@+id/changeTextDetails"
+                android:layout_width="114dp"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/marketValueTitle"
+                android:layout_width="163dp"
+                android:layout_height="wrap_content"
+                android:text="Market Value: " />
+
+            <TextView
+                android:id="@+id/marketValueText"
+                android:layout_width="114dp"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+        </TableRow>
+
+    </TableLayout>
+
+    <Button
+        android:id="@+id/tradeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_marginTop="54dp"
+        android:backgroundTint="#4CAF50"
+        android:text="TRADE"
+        android:textColor="#FFFFFF"
+        app:layout_constraintStart_toEndOf="@+id/tableLayout2"
+        app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
 </androidx.constraintlayout.widget.ConstraintLayout>
