@@ -31,6 +31,7 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
@@ -45,8 +46,10 @@ import org.w3c.dom.Text;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import android.util.DisplayMetrics;
+import android.widget.Toast;
 
 public class DetailsActivity extends AppCompatActivity {
 
@@ -67,14 +70,16 @@ public class DetailsActivity extends AppCompatActivity {
     private Button tradeButton;
 
     //related to portfolio
-    Integer quantityToBuy = 0;
-    Double totalCostToBuy = 0.00;
-
     Integer curQuantity = 0;
     Double curAvgCostShare = 0.00;
     Double curTotalCost = 0.00;
     Double curChange_Trade = 0.00;
     Double curMarketValue = 0.00;
+
+    Integer quantityToBuy = 0;
+    Double totalCostToBuy = 0.00;
+    Integer quantityToSell = 0;
+    Double totalCostToSell = 0.00;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,86 +138,253 @@ public class DetailsActivity extends AppCompatActivity {
 
         /*********** set up the dialogue button event listener *****************/
 
-            tradeButton = (Button) findViewById(R.id.tradeButton);
+        tradeButton = (Button) findViewById(R.id.tradeButton);
 
-            // add button listener
-            tradeButton.setOnClickListener(new View.OnClickListener() {
+        // add button listener
+        tradeButton.setOnClickListener(new View.OnClickListener() {
 
-                @Override
-                public void onClick(View arg0) {
+            @Override
+            public void onClick(View arg0) {
+                getLatestStockQuote(curTicker, new StockQuoteCallback() {
+                    @Override
+                    public void onQuoteReceived(double price) {
+                        createTradeDialogue(price);
+                    }
+                });
+            }
+        });
 
-                    // custom dialog
-                    final Dialog dialog = new Dialog(DetailsActivity.this);
-                    dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+    }
 
-                    dialog.setContentView(R.layout.trade_dialogue);
+    private void createTradeDialogue(double latestPrice){
 
-                    //setting the dialogue width to 90% of the screen
-                    DisplayMetrics displayMetrics = new DisplayMetrics();
-                    getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-                    int dialogWidth = (int) (displayMetrics.widthPixels * 0.90);
-                    WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
-                    layoutParams.copyFrom(dialog.getWindow().getAttributes());
-                    layoutParams.width = dialogWidth;
-                    dialog.getWindow().setAttributes(layoutParams);
+        Log.d("DetailsActivity", "createTradeDialogue executed");
+        // custom dialog
+        final Dialog dialog = new Dialog(DetailsActivity.this);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
-                    // set the custom dialog components - text, image and button
-                    TextView dialogueHeader = dialog.findViewById(R.id.dialogueHeader);
-                    dialogueHeader.setText("Trade " + curCompanyName + " Shares");
+        dialog.setContentView(R.layout.trade_dialogue);
 
-                    EditText editText = dialog.findViewById(R.id.editText);
-                    TextView tradeInputGuideText = dialog.findViewById(R.id.tradeInputGuideText);
-                    tradeInputGuideText.setText(quantityToBuy + "*$" + curPrice + "/share = " + totalCostToBuy);
+        //setting the dialogue width to 90% of the screen
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int dialogWidth = (int) (displayMetrics.widthPixels * 0.90);
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        layoutParams.copyFrom(dialog.getWindow().getAttributes());
+        layoutParams.width = dialogWidth;
+        dialog.getWindow().setAttributes(layoutParams);
 
-                    TextView tradeBalanceText = dialog.findViewById(R.id.tradeBalanceText);
-                    tradeBalanceText.setText("$"+ curBalance +" to buy " + curTicker);
+        // set the custom dialog components - text, image and button
+        TextView dialogueHeader = dialog.findViewById(R.id.dialogueHeader);
+        dialogueHeader.setText("Trade " + curCompanyName + " Shares");
 
-                    editText.addTextChangedListener(new TextWatcher() {
+        EditText editText = dialog.findViewById(R.id.editText);
+        TextView tradeInputGuideText = dialog.findViewById(R.id.tradeInputGuideText);
+        tradeInputGuideText.setText(quantityToBuy + "*$" + latestPrice + "/share = " + totalCostToBuy);
+
+        TextView tradeBalanceText = dialog.findViewById(R.id.tradeBalanceText);
+        tradeBalanceText.setText("$"+ String.format("%.2f", curBalance) +" to buy " + curTicker);
+
+        editText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence seq, int start, int count, int after) {
+                // not needed
+            }
+
+            @Override
+            public void onTextChanged(CharSequence seq, int start, int before, int count) {
+                //Updating tradeInputListener TextView with the text entered by the user
+                Log.d("DetailsActivity", "onTextChanged executed ");
+
+                if (!seq.toString().isEmpty()) {
+                    quantityToBuy = Integer.parseInt(seq.toString());
+                    totalCostToBuy = quantityToBuy * latestPrice;
+                    String formattedTotalCostToBuy = String.format("%.2f", totalCostToBuy);
+                    tradeInputGuideText.setText(quantityToBuy + "*$" + latestPrice + "/share = $" + formattedTotalCostToBuy);
+                } else {
+                    // If the input is empty, set quantityToBuy and totalCostToBuy to 0
+                    quantityToBuy = 0;
+                    totalCostToBuy = 0.0;
+                    tradeInputGuideText.setText(quantityToBuy + "*$" + latestPrice + "/share = $" + totalCostToBuy);
+                }
+
+            }
+
+            @Override
+            public void afterTextChanged(Editable e) {
+                // not needed
+            }
+        });
+
+
+        Button buyButton = (Button) dialog.findViewById(R.id.buyButton);
+        buyButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if (editText.getText().toString().isEmpty() || quantityToBuy < 1) {
+                    Toast.makeText(DetailsActivity.this, "Please enter a valid amount", Toast.LENGTH_SHORT).show();
+                } else if (totalCostToBuy > curBalance) {
+                    Toast.makeText(DetailsActivity.this, "Not enough money in wallet", Toast.LENGTH_SHORT).show();
+                } else {
+                    getLatestStockQuote(curTicker, new StockQuoteCallback() {
                         @Override
-                        public void beforeTextChanged(CharSequence seq, int start, int count, int after) {
-                            // not needed
-                        }
-
-                        @Override
-                        public void onTextChanged(CharSequence seq, int start, int before, int count) {
-                            //Updating tradeInputListener TextView with the text entered by the user
-
-                            if (!seq.toString().isEmpty()) {
-                                quantityToBuy = Integer.parseInt(seq.toString());
-                                totalCostToBuy = quantityToBuy * curPrice;
-                                String formattedTotalCostToBuy = String.format("%.2f", totalCostToBuy);
-                                tradeInputGuideText.setText(quantityToBuy + "*$" + curPrice + "/share = $" + formattedTotalCostToBuy);
-                            } else {
-                                // If the input is empty, set quantityToBuy and totalCostToBuy to 0
-                                quantityToBuy = 0;
-                                totalCostToBuy = 0.0;
-                                tradeInputGuideText.setText(quantityToBuy + "*$" + curPrice + "/share = $" + totalCostToBuy);
-                            }
-
-                        }
-
-                        @Override
-                        public void afterTextChanged(Editable e) {
-                            // not needed
-                        }
-                    });
-
-
-                    Button buyButton = (Button) dialog.findViewById(R.id.buyButton);
-                    // if button is clicked, close the custom dialog
-                    buyButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
+                        public void onQuoteReceived(double price) {
+                            finalBuy(curTicker, price);
+                            launchBuySunccesDialogue();
                             dialog.dismiss();
                         }
                     });
-
-                    dialog.show();
                 }
-            });
+            }
+
+        });
+
+        Button sellButton = (Button) dialog.findViewById(R.id.sellButton);
+        sellButton.setOnClickListener(new View.OnClickListener(){
+
+            @Override
+            public void onClick(View v) {
+                //I had called the values in the input "ToBuy", but they are the same for sell operation
+                quantityToSell = quantityToBuy;
+                totalCostToSell = totalCostToBuy;
+                if (editText.getText().toString().isEmpty() || quantityToSell < 1) {
+                    Toast.makeText(DetailsActivity.this, "Please enter a valid amount", Toast.LENGTH_SHORT).show();
+                } else if (quantityToSell > curQuantity){
+                    Toast.makeText(DetailsActivity.this, "Not enough shares to sell", Toast.LENGTH_SHORT).show();
+                } else {
+                    getLatestStockQuote(curTicker, new StockQuoteCallback() {
+                        @Override
+                        public void onQuoteReceived(double price) {
+                            finalSell(curTicker, price);
+                            dialog.dismiss();
+                        }
+                    });
+                }
+
+
+            }
+        });
+
+        dialog.show();
     }
 
+    private void launchBuySunccesDialogue(){
+        // custom dialog
+        final Dialog dialog = new Dialog(DetailsActivity.this);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
 
+        dialog.setContentView(R.layout.buy_success_dialogue);
+
+        //setting the dialogue width to 90% of the screen
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int dialogWidth = (int) (displayMetrics.widthPixels * 0.90);
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        layoutParams.copyFrom(dialog.getWindow().getAttributes());
+        layoutParams.width = dialogWidth;
+        dialog.getWindow().setAttributes(layoutParams);
+
+        TextView successDialogueMessage = dialog.findViewById(R.id.buy_success_message);
+        successDialogueMessage.setText("You have successfully bought " + quantityToBuy + " shares of " + curTicker);
+
+        Button buyDoneButton = (Button) dialog.findViewById(R.id.buy_done_button);
+        buyDoneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
+
+    }
+
+    private void finalBuy(String tickerSymbol, double price){
+        //the argument price does not have an actual use, we already updated our curPrice before
+        Log.d("DetailsActivity", "finalBuy was called for " + tickerSymbol + " and price: " + price);
+
+        //update portfolio item
+        Integer finalQuantityToBuy = curQuantity + quantityToBuy;
+        double finalTotalCostToBuy = curTotalCost + totalCostToBuy;
+        Log.d("DetailsActivity", "arguments of updatePortfolioItem: " + curTicker + " " + curCompanyName + " " + finalQuantityToBuy + " " + finalTotalCostToBuy);
+        updatePortfolioItem(curTicker, curCompanyName, finalQuantityToBuy, finalTotalCostToBuy);
+
+        //update the balance locally and in the DB
+        curBalance = curBalance - totalCostToBuy;
+        updateBalanceData(curBalance);
+
+        //update values in the trade section
+        curQuantity = finalQuantityToBuy;
+        curTotalCost = finalTotalCostToBuy;
+        curAvgCostShare = curTotalCost / curQuantity;
+        curMarketValue = curQuantity * curPrice;
+        curChange_Trade = ( curPrice - curAvgCostShare ) * curQuantity;
+//        same as in main activity: double changeInPriceFromTotalCost = (currentPrice - avgPriceOfStock) * quantity;
+
+
+        TextView sharesOwnedText = findViewById(R.id.sharesOwnedText);
+        TextView avgCostShareText = findViewById(R.id.avgCostShareText);
+        TextView totalCostText = findViewById(R.id.totalCostText);
+        TextView changeTextDetails = findViewById(R.id.changeTextTrade);
+        TextView marketValueText = findViewById(R.id.marketValueText);
+
+        sharesOwnedText.setText(String.valueOf(curQuantity));
+        avgCostShareText.setText(String.format("%.2f",curAvgCostShare));
+        totalCostText.setText(String.format("%.2f",curTotalCost));
+        changeTextDetails.setText(String.format("%.2f", curChange_Trade));
+        marketValueText.setText(String.format("%.2f", curMarketValue));
+
+    }
+
+    private void finalSell(String tickerSymbol, double price){
+        //the argument price does not have an actual use, we already updated our curPrice before
+        Log.d("DetailsActivity", "finalSell was called for " + tickerSymbol + " and price: " + price);
+
+        //update portfolio item and values in trade section
+        Integer finalQuantityToSell = curQuantity - quantityToSell;
+        double finalTotalCostToSell = curTotalCost - totalCostToSell;
+
+
+        if (finalQuantityToSell == 0){
+            deletePortfolioItem(tickerSymbol);
+
+            //in this case set all the values in trade section to 0 ??
+            curQuantity = finalQuantityToSell; //which is 0
+            curTotalCost = 0.00;
+            curAvgCostShare = 0.00;
+            curMarketValue = 0.00;
+            curChange_Trade = 0.00;
+
+        } else {
+            updatePortfolioItem(curTicker, curCompanyName, finalQuantityToSell, finalTotalCostToSell);
+            curQuantity = finalQuantityToSell;
+            curTotalCost = finalTotalCostToSell;
+            curAvgCostShare = curTotalCost / curQuantity;
+            curMarketValue = curQuantity * curPrice;
+            curChange_Trade = ( curPrice - curAvgCostShare ) * curQuantity;
+            //same as in main activity: double changeInPriceFromTotalCost = (currentPrice - avgPriceOfStock) * quantity;
+
+        }
+
+        //update the balance locally and in the DB
+        curBalance = curBalance + totalCostToBuy;
+        updateBalanceData(curBalance);
+
+        //update textViews in trade section
+        TextView sharesOwnedText = findViewById(R.id.sharesOwnedText);
+        TextView avgCostShareText = findViewById(R.id.avgCostShareText);
+        TextView totalCostText = findViewById(R.id.totalCostText);
+        TextView changeTextDetails = findViewById(R.id.changeTextTrade);
+        TextView marketValueText = findViewById(R.id.marketValueText);
+
+        sharesOwnedText.setText(String.valueOf(curQuantity));
+        avgCostShareText.setText(String.format("%.2f",curAvgCostShare));
+        totalCostText.setText(String.format("%.2f",curTotalCost));
+        changeTextDetails.setText(String.format("%.2f", curChange_Trade));
+        marketValueText.setText(String.format("%.2f", curMarketValue));
+
+    }
 
     private void initTradeSection(String tickerSymbol){
         myPortfolioStocks = loadPortfolioStocks();
@@ -318,7 +490,7 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     private void updatePortfolioItem(String tickerSymbol , String companyName, Integer stockQuantity, Double totalCost){
-        String updatePortfolioUrl = BASE_URL + "api/portfolio/updatePortfolio";
+        String updatePortfolioUrl = BASE_URL + "/api/portfolio/updatePortfolio/" + tickerSymbol;
         RequestQueue queue = Volley.newRequestQueue(this);
         JSONObject requestBody = new JSONObject();
         try {
@@ -328,6 +500,7 @@ public class DetailsActivity extends AppCompatActivity {
             requestBody.put("total_cost", totalCost);
 
         } catch (JSONException e){
+            Log.e("DetailsActivity", "Error creating JSONObject: " + e.getMessage());
             e.printStackTrace();
         }
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.PUT, updatePortfolioUrl, requestBody,
@@ -341,13 +514,14 @@ public class DetailsActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 Log.e("DetailsActivity", "Error updating portfolio item: " + volleyError.getMessage());
+                volleyError.printStackTrace();
             }
         });
         queue.add(jsonObjectRequest);
     }
 
     private void deletePortfolioItem(String tickerSymbol){
-        String deletePortfolioUrl = BASE_URL + "api/portfolio/deletePortfolio/" + tickerSymbol;
+        String deletePortfolioUrl = BASE_URL + "/api/portfolio/deletePortfolio/" + tickerSymbol;
         RequestQueue queue = Volley.newRequestQueue(this);
         StringRequest stringRequest = new StringRequest(Request.Method.DELETE, deletePortfolioUrl,
                 new Response.Listener<String>() {
@@ -365,6 +539,38 @@ public class DetailsActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
 
+    private void getLatestStockQuote(String tickerSymbol, StockQuoteCallback callback) {
+        String quoteUrl = BASE_URL + "/search-quote/" + tickerSymbol;
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, quoteUrl, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            double latestPrice = response.getDouble("c");
+                            curPrice = latestPrice;
+                            Log.d("DetailsActivity", "Latest Stock Quote fetched: " + curPrice);
+                            callback.onQuoteReceived(curPrice);
+
+                        } catch (JSONException e) {
+                            Log.e("DetailsActivity", "Error parsing JSON: " + e.getMessage());
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Log.e("DetailsActivity", "Error fetching latest stock quote: " + error.getMessage());
+                    }
+                });
+
+        queue.add(jsonObjectRequest);
+    }
+
+    public interface StockQuoteCallback {
+        void onQuoteReceived(double price);
+    }
     private void getCompanyData(String tickerSymbol) {
         String companyUrl = BASE_URL + "/search-company/" + tickerSymbol;
 
@@ -430,7 +636,7 @@ public class DetailsActivity extends AppCompatActivity {
                             double changeVal = jsonObject.getDouble("d");
                             double changePercent = jsonObject.getDouble("dp");
 
-                            curPrice = currentPrice; //set the class attribute to the obtained current price
+//                            curPrice = currentPrice; //set the class attribute to the obtained current price
 
                             // Convert double values to strings
                             String curPriceStr = String.valueOf(currentPrice);
@@ -450,7 +656,7 @@ public class DetailsActivity extends AppCompatActivity {
             @Override
             public void onErrorResponse(VolleyError error) {
                 // Handling errors
-                String errorMessage = "Error fetching companyData: " + error.getMessage();
+                String errorMessage = "Error fetching quote Data: " + error.getMessage();
                 Log.d("DetailsActivity", errorMessage);
             }
         });
