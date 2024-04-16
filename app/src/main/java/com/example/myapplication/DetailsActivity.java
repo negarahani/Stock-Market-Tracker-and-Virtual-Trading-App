@@ -231,7 +231,6 @@ public class DetailsActivity extends AppCompatActivity {
                         @Override
                         public void onQuoteReceived(double price) {
                             finalBuy(curTicker, price);
-                            launchBuySunccesDialogue();
                             dialog.dismiss();
                         }
                     });
@@ -269,7 +268,7 @@ public class DetailsActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void launchBuySunccesDialogue(){
+    private void launchBuySuccesDialogue(){
         // custom dialog
         final Dialog dialog = new Dialog(DetailsActivity.this);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -298,6 +297,36 @@ public class DetailsActivity extends AppCompatActivity {
 
         dialog.show();
 
+    }
+
+    private void launchSellDialogue(){
+        // custom dialog
+        final Dialog dialog = new Dialog(DetailsActivity.this);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        dialog.setContentView(R.layout.sell_success_dialogue);
+
+        //setting the dialogue width to 90% of the screen
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int dialogWidth = (int) (displayMetrics.widthPixels * 0.90);
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        layoutParams.copyFrom(dialog.getWindow().getAttributes());
+        layoutParams.width = dialogWidth;
+        dialog.getWindow().setAttributes(layoutParams);
+
+        TextView successDialogueMessage = dialog.findViewById(R.id.sell_success_message);
+        successDialogueMessage.setText("You have successfully sold " + quantityToSell + " shares of " + curTicker);
+
+        Button sellDoneButton = (Button) dialog.findViewById(R.id.sell_done_button);
+        sellDoneButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+
+        dialog.show();
     }
 
     private void finalBuy(String tickerSymbol, double price){
@@ -334,6 +363,9 @@ public class DetailsActivity extends AppCompatActivity {
         totalCostText.setText(String.format("%.2f",curTotalCost));
         changeTextDetails.setText(String.format("%.2f", curChange_Trade));
         marketValueText.setText(String.format("%.2f", curMarketValue));
+
+        //launch the success dialogue after selling is successfully done
+        launchBuySuccesDialogue();
 
     }
 
@@ -383,6 +415,9 @@ public class DetailsActivity extends AppCompatActivity {
         totalCostText.setText(String.format("%.2f",curTotalCost));
         changeTextDetails.setText(String.format("%.2f", curChange_Trade));
         marketValueText.setText(String.format("%.2f", curMarketValue));
+
+        //launch the success dialogue after selling is successfully done
+        launchSellDialogue();
 
     }
 
