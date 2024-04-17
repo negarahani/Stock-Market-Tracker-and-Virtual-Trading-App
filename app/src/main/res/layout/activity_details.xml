@@ -172,4 +172,13 @@
         android:textColor="#FFFFFF"
         app:layout_constraintStart_toEndOf="@+id/tableLayout2"
         app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
+
+    <include
+        layout="@layout/chart_layout"
+        android:layout_width="400dp"
+        android:layout_height="403dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginTop="51dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tableLayout2" />
 </androidx.constraintlayout.widget.ConstraintLayout>

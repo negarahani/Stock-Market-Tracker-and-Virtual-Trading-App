@@ -13,6 +13,9 @@ import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -80,6 +83,7 @@ public class DetailsActivity extends AppCompatActivity {
     Double totalCostToBuy = 0.00;
     Integer quantityToSell = 0;
     Double totalCostToSell = 0.00;
+    JSONArray historicalDataArray;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +94,8 @@ public class DetailsActivity extends AppCompatActivity {
         //accessing the data passed from MainActivity
         Intent i = getIntent();
         String ticker = i.getStringExtra("inputValue");
-        curTicker = ticker.toUpperCase();
+        ticker = ticker.toUpperCase();
+        curTicker = ticker; //this is extra but I have used it so leave it this way for now!
 
 
         Toolbar toolbar = findViewById(R.id.details_toolbar);
@@ -154,8 +159,68 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
 
+        /*********************** related to Histocial chart section ***************************/
+        getHistoricalChartData(curTicker);
+
     }
 
+    /************************ related to Historical Chart (SMA) ************************/
+
+    private void getHistoricalChartData(String tickerSymbol){
+        String historicalChartUrl = BASE_URL + "/search-chart/" + tickerSymbol;
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, historicalChartUrl, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray resultsArray = response.getJSONArray("results");
+                            historicalDataArray = resultsArray;
+                            createHistoricalChart(historicalDataArray);
+
+                        } catch (JSONException e) {
+                            String errorMessage = "Error parsing JSON: " + e.getMessage();
+                            Log.e("MainActivity", errorMessage);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                String errorMessage = "Error fetching chart data: " + error.getMessage();
+                Log.e("DetailsActivity", errorMessage);
+            }
+        });
+        queue.add(jsonObjectRequest);
+
+    }
+
+    private void createHistoricalChart(JSONArray dataArray){
+        Log.d("DetailsActivity","Data for creating historical chart is " + dataArray);
+        WebView webView = findViewById(R.id.webView_1);
+
+        // Enable JavaScript execution in the WebView
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+
+        // Load the HTML file from the assets directory
+        webView.loadUrl("file:///android_asset/sample.html");
+
+        // Calling the method to pass data to JavaScript when the page is finished loading
+        // source: StackOverflow , Url: https://stackoverflow.com/questions/57033537/how-can-i-inject-js-code-in-the-shown-page-in-a-webview
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                // Calling JavaScript function to pass data
+                webView.loadUrl("javascript:createHistoricalChart(" + dataArray + ")");
+            }
+        });
+    }
+
+
+
+    /************************ related to Portfolio ************************************/
     private void createTradeDialogue(double latestPrice){
 
         Log.d("DetailsActivity", "createTradeDialogue executed");
@@ -268,7 +333,7 @@ public class DetailsActivity extends AppCompatActivity {
         dialog.show();
     }
 
-    private void launchBuySuccesDialogue(){
+    private void launchBuySuccessDialogue(){
         // custom dialog
         final Dialog dialog = new Dialog(DetailsActivity.this);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -299,7 +364,7 @@ public class DetailsActivity extends AppCompatActivity {
 
     }
 
-    private void launchSellDialogue(){
+    private void launchSellSuccessDialogue(){
         // custom dialog
         final Dialog dialog = new Dialog(DetailsActivity.this);
         dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
@@ -365,7 +430,7 @@ public class DetailsActivity extends AppCompatActivity {
         marketValueText.setText(String.format("%.2f", curMarketValue));
 
         //launch the success dialogue after selling is successfully done
-        launchBuySuccesDialogue();
+        launchBuySuccessDialogue();
 
     }
 
@@ -417,7 +482,7 @@ public class DetailsActivity extends AppCompatActivity {
         marketValueText.setText(String.format("%.2f", curMarketValue));
 
         //launch the success dialogue after selling is successfully done
-        launchSellDialogue();
+        launchSellSuccessDialogue();
 
     }
 
@@ -465,6 +530,9 @@ public class DetailsActivity extends AppCompatActivity {
         Type type = new TypeToken<List<PortfolioStock>>() {}.getType();
         return gson.fromJson(json, type);
     }
+
+    /************************ end of portfolio related methods *****************************/
+
 
     private void getBalanceData() {
         String balanceUrl = BASE_URL + "/api/wallet/getBalance";

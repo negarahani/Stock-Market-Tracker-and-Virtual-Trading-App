@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Charts Tab</title>
+  <!-- Include necessary libraries -->
+<!--  <script src="https://code.highcharts.com/highcharts.js"></script>-->
+  <script src="https://code.highcharts.com/stock/highstock.js"></script>
+  <script src="https://code.highcharts.com/stock/indicators/indicators.js"></script>
+  <script src="https://code.highcharts.com/stock/indicators/volume-by-price.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
+</head>
+<body>
+
+<div class="container col-lg-10" style="margin-top: 10px;">
+  <div id="chartContainer" style="height: 350px;"></div>
+</div>
+
+<script>
+
+
+  // A function to create the chart
+
+      console.log("Javascript is working");
+
+
+
+  function createHistoricalChart(resultsData) {
+
+      console.log("createHistoricalChart was called");
+      console.log("Received data:", resultsData);
+
+      // Parse the JSON string into an array of objects
+      const dataArray = resultsData;
+
+      // creating ohlc and volume arrays
+      const ohlc = [];
+      const volume = [];
+
+
+      dataArray.forEach((item) => {
+          ohlc.push([
+              item.t, // the date
+              item.o, // open
+              item.h, // high
+              item.l, // low
+              item.c  // close
+          ]);
+
+          volume.push([
+              item.t,  // the date
+              item.v  // the volume
+          ]);
+      });
+
+      // Creating chart using HighCharts
+      Highcharts.stockChart('chartContainer', {
+
+          chart:{
+      backgroundColor: '#F5F5F5'
+    },
+    rangeSelector: {
+      selected: 2
+    },
+    title: {
+      text: 'AAPL Historical'
+    },
+
+    subtitle: {
+      text: 'With SMA and Volume by Price technical indicators'
+    },
+    yAxis: [{
+      startOnTick: false,
+      endOnTick: false,
+      labels: {
+          align: 'right',
+          x: -3
+      },
+      title: {
+          text: 'OHLC'
+      },
+      height: '60%',
+      lineWidth: 2,
+      resize: {
+          enabled: true
+      }
+  }, {
+      labels: {
+          align: 'right',
+          x: -3
+      },
+      title: {
+          text: 'Volume'
+      },
+      top: '65%',
+      height: '35%',
+      offset: 0,
+      lineWidth: 2
+  }],
+  tooltip: {
+    split: true
+  },
+  plotOptions: {
+    series: {
+        dataGrouping: {
+           units: [[
+            'week',
+            [1]
+        ], [
+            'month',
+            [1, 2, 3, 4, 6]
+        ]]
+        }
+    }
+  },
+  series: [{
+    type: 'candlestick',
+    name: 'AAPL',
+    id: 'AAPL',
+    zIndex: 2,
+    data: ohlc
+}, {
+    type: 'column',
+    name: 'Volume',
+    id: 'volume',
+    data: volume,
+    yAxis: 1
+  }, {
+    type: 'vbp',
+    linkedTo: 'AAPL',
+    params: {
+        volumeSeriesID: 'volume'
+    },
+    dataLabels: {
+        enabled: false
+    },
+    zoneLines: {
+        enabled: false
+    }
+    }, {
+    type: 'sma',
+    linkedTo: 'AAPL',
+    zIndex: 1,
+    marker: {
+        enabled: false
+    }
+  }]
+      });
+  }
+
+
+
+</script>
+
+</body>
+</html>
