@@ -47,8 +47,12 @@ import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.lang.reflect.Type;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ExecutionException;
 
 import android.util.DisplayMetrics;
@@ -83,7 +87,11 @@ public class DetailsActivity extends AppCompatActivity {
     Double totalCostToBuy = 0.00;
     Integer quantityToSell = 0;
     Double totalCostToSell = 0.00;
+
+    //related to charts
     JSONArray historicalDataArray;
+    String fromDateFormatted;
+    String toDateFormatted;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,7 +169,7 @@ public class DetailsActivity extends AppCompatActivity {
 
         /*********************** related to Histocial chart section ***************************/
         getHistoricalChartData(curTicker);
-
+        getHourlyChartDates(curTicker);
     }
 
     /************************ related to Historical Chart (SMA) ************************/
@@ -176,7 +184,7 @@ public class DetailsActivity extends AppCompatActivity {
                     public void onResponse(JSONObject response) {
                         try {
                             JSONArray resultsArray = response.getJSONArray("results");
-                            historicalDataArray = resultsArray;
+                            historicalDataArray = resultsArray; //I did not really need this extra variable
                             createHistoricalChart(historicalDataArray);
 
                         } catch (JSONException e) {
@@ -218,8 +226,122 @@ public class DetailsActivity extends AppCompatActivity {
         });
     }
 
+    /************************ related to Hourly Chart ********************************/
+    private void getHourlyChartDates(String tickerSymbol) {
+        String quoteUrl = BASE_URL + "/search-quote/" + tickerSymbol;
+
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        // Request a string response from the provided URL.
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, quoteUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            // Parsing the JSON response
+                            JSONObject jsonObject = new JSONObject(response);
+
+                            //calculating fromDate and toDate for the hourly chart
+                            long lastOpenTime = jsonObject.getLong("t") * 1000; // Convert to milliseconds
+                            // Calculate current time
+                            long currentTime = System.currentTimeMillis();
+
+                            if ((currentTime - lastOpenTime) > 5 * 60 * 1000) { // Market is closed
+                                Date toDate = new Date(lastOpenTime);
+                                toDateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(toDate);
+
+                                Calendar fromDateCalendar = Calendar.getInstance();
+                                fromDateCalendar.setTime(toDate);
+                                fromDateCalendar.add(Calendar.DATE, -1);
+                                Date fromDate = fromDateCalendar.getTime();
+                                fromDateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(fromDate);
+
+                            } else { // Market is open
+                                Date toDate = new Date(currentTime);
+                                toDateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(toDate);
+
+                                Calendar fromDateCalendar = Calendar.getInstance();
+                                fromDateCalendar.setTime(toDate);
+                                fromDateCalendar.add(Calendar.DATE, -1);
+                                Date fromDate = fromDateCalendar.getTime();
+                                fromDateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(fromDate);
+                            }
+
+                            Log.d("DetailsActivity", "fromDateFormatted is: " + fromDateFormatted);
+                            Log.d("DetailsActivity", "tDateFormatted is: " + toDateFormatted);
+
+                            getHourlyPriceData(tickerSymbol, fromDateFormatted, toDateFormatted);
 
 
+                        } catch (JSONException e) {
+                            // JSON parsing error
+                            String errorMessage = "Error parsing JSON: " + e.getMessage();
+                            Log.e("DetailsActivity", errorMessage);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handling errors
+                String errorMessage = "Error fetching market status Data: " + error.getMessage();
+                Log.d("DetailsActivity", errorMessage);
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+    private void getHourlyPriceData(String tickerSymbol, String fromDate, String toDate) {
+        String hourlyPriceUrl = BASE_URL + "/search-hourly-price/" + tickerSymbol + "/" + fromDate + "/" + toDate;
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, hourlyPriceUrl, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray resultsArray = response.getJSONArray("results");
+                            createHourlyChart(resultsArray);
+
+                        } catch (JSONException e) {
+                            String errorMessage = "Error parsing JSON: " + e.getMessage();
+                            Log.e("MainActivity", errorMessage);
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handle error
+                String errorMessage = "Error fetching hourly price data: " + error.getMessage();
+                Log.e("DetailsActivity", errorMessage);
+            }
+        });
+        queue.add(jsonObjectRequest);
+    }
+
+    private void createHourlyChart(JSONArray dataArray){
+        Log.d("DetailsActivity","Data for creating hourly chart is " + dataArray);
+        WebView webView = findViewById(R.id.webView_hourlyChart);
+
+        // Enable JavaScript execution in the WebView
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+
+        // Load the HTML file from the assets directory
+        webView.loadUrl("file:///android_asset/my_hourly_chart.html");
+
+        // Calling the method to pass data to JavaScript when the page is finished loading
+        // source: StackOverflow , Url: https://stackoverflow.com/questions/57033537/how-can-i-inject-js-code-in-the-shown-page-in-a-webview
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                // Calling JavaScript function to pass data
+                webView.loadUrl("javascript:createHourlyChart(" + dataArray + ")");
+            }
+        });
+    }
     /************************ related to Portfolio ************************************/
     private void createTradeDialogue(double latestPrice){
 
@@ -745,6 +867,7 @@ public class DetailsActivity extends AppCompatActivity {
                             String curPriceStr = String.valueOf(currentPrice);
                             String changeValStr = String.valueOf(changeVal);
                             String changePercentStr = String.valueOf(changePercent);
+
 
                             currentPriceText.setText("$" + curPriceStr);
                             changeText.setText("$" + changeValStr + " (" + changePercentStr + "%)");
