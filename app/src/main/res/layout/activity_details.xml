@@ -68,7 +68,7 @@ android:fillViewport="true">
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
             android:layout_width="match_parent"
-            android:layout_height="331dp"
+            android:layout_height="373dp"
             android:layout_weight="1"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
@@ -81,8 +81,6 @@ android:fillViewport="true">
             app:tabIndicatorColor="#3F51B5"
             app:layout_behavior="@string/appbar_scrolling_view_behavior"
             app:tabMode="fixed" />
-
-
 
 
         <TextView
@@ -204,28 +202,9 @@ android:fillViewport="true">
             app:layout_constraintStart_toEndOf="@+id/tableLayout2"
             app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
 
+
         <include
             android:id="@+id/include"
-            layout="@layout/chart_layout"
-            android:layout_width="400dp"
-            android:layout_height="403dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="51dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tableLayout2" />
-
-<!--        <include-->
-<!--            android:id="@+id/include_2"-->
-<!--            layout="@layout/hourly_chart"-->
-<!--            android:layout_width="400dp"-->
-<!--            android:layout_height="403dp"-->
-<!--            android:layout_marginStart="5dp"-->
-<!--            android:layout_marginTop="10dp"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/include" />-->
-
-        <include
-            android:id="@+id/include_3"
             layout="@layout/recommendations_chart"
             android:layout_width="400dp"
             android:layout_height="403dp"
@@ -236,14 +215,14 @@ android:fillViewport="true">
             />
 
         <include
-            android:id="@+id/include_3"
+            android:id="@+id/include_2"
             layout="@layout/earnings_chart"
             android:layout_width="400dp"
             android:layout_height="403dp"
             android:layout_marginStart="5dp"
             android:layout_marginTop="10dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/include_3"
+            app:layout_constraintTop_toBottomOf="@+id/include"
             />
 
     </LinearLayout>

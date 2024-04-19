@@ -29,7 +29,7 @@ public class TabFragmentAdapter extends FragmentStateAdapter {
             case 0:
                 return HourlyChartFragment.newInstance(ticker);
             case 1:
-                return new HistoricalChartFragment();
+                return HistoricalChartFragment.newInstance(ticker);
             default:
                 return null;
         }

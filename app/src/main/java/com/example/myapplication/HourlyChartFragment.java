@@ -158,7 +158,6 @@ public class HourlyChartFragment extends Fragment {
 
     private void createHourlyChart(JSONArray dataArray){
         Log.d("DetailsActivity","Data for creating hourly chart is " + dataArray);
-//        WebView webView = findViewById(R.id.webView_hourlyChart);
 
         // Enable JavaScript execution in the WebView
         WebSettings webSettings = webView.getSettings();
