@@ -64,14 +64,37 @@ android:fillViewport="true">
 
         </TableLayout>
 
+        <!--   my spwipable tabls     -->
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/viewPager"
+            android:layout_width="match_parent"
+            android:layout_height="331dp"
+            android:layout_weight="1"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
+
+        <com.google.android.material.tabs.TabLayout
+            android:id="@+id/tabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabMaxWidth="0dp"
+            app:tabGravity="fill"
+            app:tabIndicatorColor="#3F51B5"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior"
+            app:tabMode="fixed" />
+
+
+
+
         <TextView
             android:id="@+id/Portfolio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Portfolio"
+            android:layout_marginTop="50dp"
+            android:layout_marginBottom="10dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/details_toolbar"
-            android:layout_marginTop="5dp" />
+            app:layout_constraintTop_toBottomOf="@id/tabLayout"
+             />
 
         <TableLayout
             android:id="@+id/tableLayout2"
@@ -191,15 +214,15 @@ android:fillViewport="true">
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/tableLayout2" />
 
-        <include
-            android:id="@+id/include_2"
-            layout="@layout/hourly_chart"
-            android:layout_width="400dp"
-            android:layout_height="403dp"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="10dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/include" />
+<!--        <include-->
+<!--            android:id="@+id/include_2"-->
+<!--            layout="@layout/hourly_chart"-->
+<!--            android:layout_width="400dp"-->
+<!--            android:layout_height="403dp"-->
+<!--            android:layout_marginStart="5dp"-->
+<!--            android:layout_marginTop="10dp"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/include" />-->
 
         <include
             android:id="@+id/include_3"

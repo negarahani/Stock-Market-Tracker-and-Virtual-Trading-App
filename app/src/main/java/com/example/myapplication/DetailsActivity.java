@@ -19,6 +19,7 @@ import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -27,7 +28,9 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.viewpager2.widget.ViewPager2;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -37,6 +40,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.material.tabs.TabLayout;
+import com.google.android.material.tabs.TabLayoutMediator;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -57,6 +62,7 @@ import java.util.concurrent.ExecutionException;
 
 import android.util.DisplayMetrics;
 import android.widget.Toast;
+
 
 public class DetailsActivity extends AppCompatActivity {
 
@@ -169,9 +175,56 @@ public class DetailsActivity extends AppCompatActivity {
 
         /*********************** related to Histocial chart section ***************************/
         getHistoricalChartData(curTicker);
-        getHourlyChartDates(curTicker);
+        //getHourlyChartDates(curTicker);
         getRecommendationsData(curTicker);
         getEarningsData(curTicker);
+
+        /************************** related to swipeable tabs *****************************/
+        HourlyChartFragment hourlyChartFragment = HourlyChartFragment.newInstance(curTicker);
+
+
+        TabLayout tabLayout = findViewById(R.id.tabLayout);
+        ViewPager2 viewPager = findViewById(R.id.viewPager);
+
+        // Setting up adapter for ViewPager2
+        TabFragmentAdapter adapter = new TabFragmentAdapter(getSupportFragmentManager(), getLifecycle(), curTicker);
+        viewPager.setAdapter(adapter);
+
+        // Attaching TabLayout to ViewPager2
+        new TabLayoutMediator(tabLayout, viewPager, (tab, position) -> {
+
+//            switch (position) {
+//                case 0:
+//                    tab.setText("Hourly Chart");
+//                    break;
+//                case 1:
+//                    tab.setText("Historical Chart");
+//                    break;
+//            }
+//        }).attach();
+            View customTabView = getLayoutInflater().inflate(R.layout.tab_item, null);
+
+            ImageView tabIcon1 = customTabView.findViewById(R.id.hourly_tab_icon);
+            ImageView tabIcon2 = customTabView.findViewById(R.id.historical_tab_icon);
+
+            tab.setText("");
+
+            tab.setCustomView(customTabView);
+            customTabView.setOnClickListener(view -> {
+                viewPager.setCurrentItem(position);
+            });
+
+            //Setting different images for each tab based on position
+            if (position == 0) {
+                tabIcon1.setImageResource(R.drawable.chart_hour);
+                tabIcon2.setVisibility(View.GONE);
+            } else if (position == 1) {
+                tabIcon1.setVisibility(View.GONE);
+                tabIcon2.setImageResource(R.drawable.chart_historical);
+            }
+
+        }).attach();
+
     }
 
     /************************ related to Historical Chart (SMA) ************************/
@@ -229,121 +282,121 @@ public class DetailsActivity extends AppCompatActivity {
     }
 
     /************************ related to Hourly Chart ********************************/
-    private void getHourlyChartDates(String tickerSymbol) {
-        String quoteUrl = BASE_URL + "/search-quote/" + tickerSymbol;
-
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(this);
-
-        // Request a string response from the provided URL.
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, quoteUrl,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        try {
-                            // Parsing the JSON response
-                            JSONObject jsonObject = new JSONObject(response);
-
-                            //calculating fromDate and toDate for the hourly chart
-                            long lastOpenTime = jsonObject.getLong("t") * 1000; // Convert to milliseconds
-                            // Calculate current time
-                            long currentTime = System.currentTimeMillis();
-
-                            if ((currentTime - lastOpenTime) > 5 * 60 * 1000) { // Market is closed
-                                Date toDate = new Date(lastOpenTime);
-                                toDateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(toDate);
-
-                                Calendar fromDateCalendar = Calendar.getInstance();
-                                fromDateCalendar.setTime(toDate);
-                                fromDateCalendar.add(Calendar.DATE, -1);
-                                Date fromDate = fromDateCalendar.getTime();
-                                fromDateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(fromDate);
-
-                            } else { // Market is open
-                                Date toDate = new Date(currentTime);
-                                toDateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(toDate);
-
-                                Calendar fromDateCalendar = Calendar.getInstance();
-                                fromDateCalendar.setTime(toDate);
-                                fromDateCalendar.add(Calendar.DATE, -1);
-                                Date fromDate = fromDateCalendar.getTime();
-                                fromDateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(fromDate);
-                            }
-
-                            Log.d("DetailsActivity", "fromDateFormatted is: " + fromDateFormatted);
-                            Log.d("DetailsActivity", "tDateFormatted is: " + toDateFormatted);
-
-                            getHourlyPriceData(tickerSymbol, fromDateFormatted, toDateFormatted);
-
-
-                        } catch (JSONException e) {
-                            // JSON parsing error
-                            String errorMessage = "Error parsing JSON: " + e.getMessage();
-                            Log.e("DetailsActivity", errorMessage);
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // Handling errors
-                String errorMessage = "Error fetching market status Data: " + error.getMessage();
-                Log.d("DetailsActivity", errorMessage);
-            }
-        });
-        queue.add(stringRequest);
-    }
-
-    private void getHourlyPriceData(String tickerSymbol, String fromDate, String toDate) {
-        String hourlyPriceUrl = BASE_URL + "/search-hourly-price/" + tickerSymbol + "/" + fromDate + "/" + toDate;
-
-        RequestQueue queue = Volley.newRequestQueue(this);
-
-        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, hourlyPriceUrl, null,
-                new Response.Listener<JSONObject>() {
-                    @Override
-                    public void onResponse(JSONObject response) {
-                        try {
-                            JSONArray resultsArray = response.getJSONArray("results");
-                            createHourlyChart(resultsArray);
-
-                        } catch (JSONException e) {
-                            String errorMessage = "Error parsing JSON: " + e.getMessage();
-                            Log.e("MainActivity", errorMessage);
-                        }
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                // Handle error
-                String errorMessage = "Error fetching hourly price data: " + error.getMessage();
-                Log.e("DetailsActivity", errorMessage);
-            }
-        });
-        queue.add(jsonObjectRequest);
-    }
-
-    private void createHourlyChart(JSONArray dataArray){
-        Log.d("DetailsActivity","Data for creating hourly chart is " + dataArray);
-        WebView webView = findViewById(R.id.webView_hourlyChart);
-
-        // Enable JavaScript execution in the WebView
-        WebSettings webSettings = webView.getSettings();
-        webSettings.setJavaScriptEnabled(true);
-
-        // Load the HTML file from the assets directory
-        webView.loadUrl("file:///android_asset/my_hourly_chart.html");
-
-        // Calling the method to pass data to JavaScript when the page is finished loading
-        // source: StackOverflow , Url: https://stackoverflow.com/questions/57033537/how-can-i-inject-js-code-in-the-shown-page-in-a-webview
-        webView.setWebViewClient(new WebViewClient() {
-            @Override
-            public void onPageFinished(WebView view, String url) {
-                super.onPageFinished(view, url);
-                // Calling JavaScript function to pass data
-                webView.loadUrl("javascript:createHourlyChart(" + dataArray + ")");
-            }
-        });
-    }
+//    private void getHourlyChartDates(String tickerSymbol) {
+//        String quoteUrl = BASE_URL + "/search-quote/" + tickerSymbol;
+//
+//        // Instantiate the RequestQueue.
+//        RequestQueue queue = Volley.newRequestQueue(this);
+//
+//        // Request a string response from the provided URL.
+//        StringRequest stringRequest = new StringRequest(Request.Method.GET, quoteUrl,
+//                new Response.Listener<String>() {
+//                    @Override
+//                    public void onResponse(String response) {
+//                        try {
+//                            // Parsing the JSON response
+//                            JSONObject jsonObject = new JSONObject(response);
+//
+//                            //calculating fromDate and toDate for the hourly chart
+//                            long lastOpenTime = jsonObject.getLong("t") * 1000; // Convert to milliseconds
+//                            // Calculate current time
+//                            long currentTime = System.currentTimeMillis();
+//
+//                            if ((currentTime - lastOpenTime) > 5 * 60 * 1000) { // Market is closed
+//                                Date toDate = new Date(lastOpenTime);
+//                                toDateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(toDate);
+//
+//                                Calendar fromDateCalendar = Calendar.getInstance();
+//                                fromDateCalendar.setTime(toDate);
+//                                fromDateCalendar.add(Calendar.DATE, -1);
+//                                Date fromDate = fromDateCalendar.getTime();
+//                                fromDateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(fromDate);
+//
+//                            } else { // Market is open
+//                                Date toDate = new Date(currentTime);
+//                                toDateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(toDate);
+//
+//                                Calendar fromDateCalendar = Calendar.getInstance();
+//                                fromDateCalendar.setTime(toDate);
+//                                fromDateCalendar.add(Calendar.DATE, -1);
+//                                Date fromDate = fromDateCalendar.getTime();
+//                                fromDateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(fromDate);
+//                            }
+//
+//                            Log.d("DetailsActivity", "fromDateFormatted is: " + fromDateFormatted);
+//                            Log.d("DetailsActivity", "tDateFormatted is: " + toDateFormatted);
+//
+//                            getHourlyPriceData(tickerSymbol, fromDateFormatted, toDateFormatted);
+//
+//
+//                        } catch (JSONException e) {
+//                            // JSON parsing error
+//                            String errorMessage = "Error parsing JSON: " + e.getMessage();
+//                            Log.e("DetailsActivity", errorMessage);
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                // Handling errors
+//                String errorMessage = "Error fetching market status Data: " + error.getMessage();
+//                Log.d("DetailsActivity", errorMessage);
+//            }
+//        });
+//        queue.add(stringRequest);
+//    }
+//
+//    private void getHourlyPriceData(String tickerSymbol, String fromDate, String toDate) {
+//        String hourlyPriceUrl = BASE_URL + "/search-hourly-price/" + tickerSymbol + "/" + fromDate + "/" + toDate;
+//
+//        RequestQueue queue = Volley.newRequestQueue(this);
+//
+//        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, hourlyPriceUrl, null,
+//                new Response.Listener<JSONObject>() {
+//                    @Override
+//                    public void onResponse(JSONObject response) {
+//                        try {
+//                            JSONArray resultsArray = response.getJSONArray("results");
+//                            createHourlyChart(resultsArray);
+//
+//                        } catch (JSONException e) {
+//                            String errorMessage = "Error parsing JSON: " + e.getMessage();
+//                            Log.e("MainActivity", errorMessage);
+//                        }
+//                    }
+//                }, new Response.ErrorListener() {
+//            @Override
+//            public void onErrorResponse(VolleyError error) {
+//                // Handle error
+//                String errorMessage = "Error fetching hourly price data: " + error.getMessage();
+//                Log.e("DetailsActivity", errorMessage);
+//            }
+//        });
+//        queue.add(jsonObjectRequest);
+//    }
+//
+//    private void createHourlyChart(JSONArray dataArray){
+//        Log.d("DetailsActivity","Data for creating hourly chart is " + dataArray);
+//        WebView webView = findViewById(R.id.webView_hourlyChart);
+//
+//        // Enable JavaScript execution in the WebView
+//        WebSettings webSettings = webView.getSettings();
+//        webSettings.setJavaScriptEnabled(true);
+//
+//        // Load the HTML file from the assets directory
+//        webView.loadUrl("file:///android_asset/my_hourly_chart.html");
+//
+//        // Calling the method to pass data to JavaScript when the page is finished loading
+//        // source: StackOverflow , Url: https://stackoverflow.com/questions/57033537/how-can-i-inject-js-code-in-the-shown-page-in-a-webview
+//        webView.setWebViewClient(new WebViewClient() {
+//            @Override
+//            public void onPageFinished(WebView view, String url) {
+//                super.onPageFinished(view, url);
+//                // Calling JavaScript function to pass data
+//                webView.loadUrl("javascript:createHourlyChart(" + dataArray + ")");
+//            }
+//        });
+//    }
     /************************ related to Recommendations Chart *********************/
     private void getRecommendationsData(String tickerSymbol){
         String recommendationsUrl = BASE_URL + "/search-recommendations/" + tickerSymbol;
