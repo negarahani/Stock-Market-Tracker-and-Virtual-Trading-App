@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Charts Tab</title>
+  <!-- Include necessary libraries -->
+<!--  <script src="https://code.highcharts.com/highcharts.js"></script>-->
+  <script src="https://code.highcharts.com/stock/highstock.js"></script>
+  <script src="https://code.highcharts.com/stock/indicators/indicators.js"></script>
+  <script src="https://code.highcharts.com/stock/indicators/volume-by-price.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
+</head>
+<body>
+
+<div class="container col-lg-10" style="margin-top: 10px;">
+  <div id="chartContainer" style="height: 350px;"></div>
+</div>
+
+<script>
+
+
+  // A function to create the chart
+
+      console.log("Earnings chart JS is working");
+
+
+
+  function createEarningsChart(resultsData) {
+
+      console.log("createEarningsChart was called");
+      console.log("Received data:", resultsData);
+
+      
+      const earningsData = resultsData;
+
+            //preparing data
+        const categories = [];
+        const actualData = [];
+        const estimateData = [];
+        const surpriseData = [];
+
+        // Prepare data for chart
+        earningsData.forEach(item => {
+        categories.push(item.period);
+        //if they are null replace with 0
+        actualData.push(item.actual !== null ? item.actual : 0);
+        estimateData.push(item.estimate !== null ? item.estimate : 0);
+        surpriseData.push(item.surprise);
+        });
+
+        Highcharts.stockChart('chartContainer',{
+        title: {
+            text: 'Historical EPS Surprises'
+        },
+        rangeSelector: {
+            enabled: false 
+        },
+        navigator: {
+            enabled: false 
+        },
+        scrollbar: {
+            enabled: false 
+        },
+        chart: {
+            backgroundColor: '#F5F5F5',
+            marginLeft: 70,
+            marginRight: 70,
+            
+        },
+        xAxis:{
+            categories: categories,
+            labels: {
+            useHTML: true,
+            formatter: function () {
+                const index = this.pos;
+                return '<div style="text-align: center;">' + categories[index] + '<br/>Surprise: ' + surpriseData[index] + '</div>';
+            }
+            }
+        },
+        yAxis: {
+            title: {
+            text: 'Quantity EPS'
+            },
+            opposite: false
+        },
+        series: [{
+            type: 'spline',
+            name: 'Actual',
+            data: actualData,
+            marker: {
+            enabled: true,
+            symbol: 'circle', 
+            radius: 4
+            }
+        },{
+            type: 'spline',
+            name: 'Estimate',
+            data: estimateData,
+            marker: {
+            enabled: true,
+            symbol: 'circle', 
+            radius: 4
+            }
+        }
+        ],
+        legend: {
+        enabled: true
+        }
+        });
+
+        }
+
+      
+
+</script>
+
+</body>
+</html>

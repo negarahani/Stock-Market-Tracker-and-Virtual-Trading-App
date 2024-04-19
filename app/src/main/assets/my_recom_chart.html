@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Charts Tab</title>
+  <!-- Include necessary libraries -->
+<!--  <script src="https://code.highcharts.com/highcharts.js"></script>-->
+  <script src="https://code.highcharts.com/stock/highstock.js"></script>
+  <script src="https://code.highcharts.com/stock/indicators/indicators.js"></script>
+  <script src="https://code.highcharts.com/stock/indicators/volume-by-price.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/export-data.js"></script>
+  <script src="https://code.highcharts.com/stock/modules/accessibility.js"></script>
+</head>
+<body>
+
+<div class="container col-lg-10" style="margin-top: 10px;">
+  <div id="chartContainer" style="height: 350px;"></div>
+</div>
+
+<script>
+
+
+  // A function to create the chart
+
+      console.log("Hourly chart JS is working");
+
+
+
+  function createRecommendationsChart(resultsData) {
+
+      console.log("createRecommendationsChart was called");
+      console.log("Received data:", resultsData);
+
+      const recomData = resultsData;
+
+      const categories = recomData.map(function(item) {
+        //console.log('Period:', item.period); // Print the value of item.period
+        return item.period; 
+    });
+    
+    const series =  [
+        { name: 'Strong Buy', data: recomData.map(function(item) { return item.strongBuy; }), color:'#004d00'},
+        { name: 'Buy', data: recomData.map(function(item) { return item.buy; }), color:'#00cc66'},
+        { name: 'Hold', data: recomData.map(function(item) { return item.hold; }), color:'#b37700'},
+        { name: 'Sell', data: recomData.map(function(item) { return item.sell; }), color: '#ff6666'},
+        { name: 'Strong Sell', data: recomData.map(function(item) { return item.strongSell; }), color: '#800000' }
+    ];
+
+    
+    //console.log('categories',categories);
+    //console.log('series',series);
+
+
+    Highcharts.stockChart('chartContainer',{
+      chart: {
+        type: 'column',
+        backgroundColor: '#F5F5F5'
+      },
+      title: {
+        text: 'Recommendation Trends'
+      },
+      rangeSelector: {
+        enabled: false 
+      },
+      navigator: {
+        enabled: false 
+      },
+      xAxis: {
+        type: 'category',
+        categories: categories,
+        labels: {
+          formatter: function () {
+            const index = this.value; 
+            return categories[index]; 
+          }
+        }
+      },
+      yAxis: {
+        title: {
+          text: '#Analysis'
+        },
+        opposite: false
+      },
+      legend: { 
+        enabled: true, 
+        layout: 'horizontal', 
+        align: 'center',
+        verticalAlign: 'bottom',
+        borderWidth: 0 
+      },
+      tooltip: {
+        shared: true
+      },
+      plotOptions: {
+        column: {
+          stacking: 'normal', 
+          dataLabels: {
+            enabled: true,
+            inside: true, 
+            formatter: function () {
+                return this.y; 
+            },
+            style: {
+                fontWeight: 'bold',
+                color: 'white'
+            }
+          }
+        }
+      },
+      scrollbar: {
+        enabled: false 
+      },
+      series: series
+  });
+
+      
+  
+  }
+
+
+
+</script>
+
+</body>
+</html>

@@ -170,6 +170,8 @@ public class DetailsActivity extends AppCompatActivity {
         /*********************** related to Histocial chart section ***************************/
         getHistoricalChartData(curTicker);
         getHourlyChartDates(curTicker);
+        getRecommendationsData(curTicker);
+        getEarningsData(curTicker);
     }
 
     /************************ related to Historical Chart (SMA) ************************/
@@ -342,6 +344,101 @@ public class DetailsActivity extends AppCompatActivity {
             }
         });
     }
+    /************************ related to Recommendations Chart *********************/
+    private void getRecommendationsData(String tickerSymbol){
+        String recommendationsUrl = BASE_URL + "/search-recommendations/" + tickerSymbol;
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, recommendationsUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                            Log.d("DetailsActivity", "recommendations response is: " + response);
+                            createRecommendationsChart(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                // Handle error
+                String errorMessage = "Error fetching recommendations data: " + volleyError.getMessage();
+                Log.e("DetailsActivity", errorMessage);
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+    private void createRecommendationsChart(String recomData){
+        Log.d("DetailsActivity","The recommendations Data is: " + recomData);
+        WebView webView = findViewById(R.id.webView_recom_chart);
+
+        // Enable JavaScript execution in the WebView
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+
+        // Load the HTML file from the assets directory
+        webView.loadUrl("file:///android_asset/my_recom_chart.html");
+
+        // Calling the method to pass data to JavaScript when the page is finished loading
+        // source: StackOverflow , Url: https://stackoverflow.com/questions/57033537/how-can-i-inject-js-code-in-the-shown-page-in-a-webview
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                // Calling JavaScript function to pass data
+                webView.loadUrl("javascript:createRecommendationsChart(" + recomData + ")");
+            }
+        });
+
+    }
+
+    /************************ related to Earnings Chart ********************************/
+    private void getEarningsData(String tickerSymbol){
+        String earningsUrl = BASE_URL + "/search-earnings/" + tickerSymbol;
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, earningsUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("DetailsActivity", "earnings response is: " + response);
+                        createEarningsChart(response);
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                // Handle error
+                String errorMessage = "Error fetching earnings data: " + volleyError.getMessage();
+                Log.e("DetailsActivity", errorMessage);
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+    private void createEarningsChart(String earningsData){
+        Log.d("DetailsActivity","The earnings Data is: " + earningsData);
+        WebView webView = findViewById(R.id.webView_earnings_chart);
+
+        // Enable JavaScript execution in the WebView
+        WebSettings webSettings = webView.getSettings();
+        webSettings.setJavaScriptEnabled(true);
+
+        // Load the HTML file from the assets directory
+        webView.loadUrl("file:///android_asset/my_earnings_chart.html");
+
+        // Calling the method to pass data to JavaScript when the page is finished loading
+        // source: StackOverflow , Url: https://stackoverflow.com/questions/57033537/how-can-i-inject-js-code-in-the-shown-page-in-a-webview
+        webView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                // Calling JavaScript function to pass data
+                webView.loadUrl("javascript:createEarningsChart(" + earningsData + ")");
+            }
+        });
+    }
+
     /************************ related to Portfolio ************************************/
     private void createTradeDialogue(double latestPrice){
 
