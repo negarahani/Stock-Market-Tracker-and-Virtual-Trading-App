@@ -11,36 +11,36 @@ android:layout_height="wrap_content"
 android:layout_weight="1"
 android:fillViewport="true"
 android:background="@color/white">
-    <LinearLayout
-        android:layout_height="match_parent"
-        android:layout_width="match_parent"
-        android:orientation="vertical"
-        android:id="@+id/main"
-        tools:context=".DetailsActivity"
-        android:background="@color/white"
-        >
+<!--    <LinearLayout-->
+<!--        android:layout_height="match_parent"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:orientation="vertical"-->
+<!--        android:id="@+id/main"-->
+<!--        tools:context=".DetailsActivity"-->
+<!--        android:background="@color/white"-->
+<!--        >-->
 
 
-        <include
-            android:id="@+id/details_toolbar"
-            layout="@layout/custom_toolbar" />
+<!--        <include-->
+<!--            android:id="@+id/details_toolbar"-->
+<!--            layout="@layout/custom_toolbar" />-->
 
-        <ProgressBar
-            android:id="@+id/details_progress_bar"
-            android:layout_width="wrap_content"
-            android:layout_height="match_parent"
-            android:layout_gravity="center"
-            android:layout_marginTop="270dp"
-            android:layout_marginBottom="380dp"
-            android:indeterminateTint="@color/custom_progress_color"
-            app:layout_constraintTop_toTopOf="@id/details_toolbar" />
+<!--        <ProgressBar-->
+<!--            android:id="@+id/details_progress_bar"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:layout_marginTop="270dp"-->
+<!--            android:layout_marginBottom="380dp"-->
+<!--            android:indeterminateTint="@color/custom_progress_color"-->
+<!--            app:layout_constraintTop_toTopOf="@id/details_toolbar" />-->
 
     <LinearLayout
         android:id="@+id/content_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        android:visibility="gone">
+        android:orientation="vertical">
+<!--        android:visibility="gone">-->
 
 
         <TableLayout
@@ -165,6 +165,20 @@ android:background="@color/white">
             layout="@layout/about_section"
             />
 
+        <TextView
+            android:id="@+id/Insights"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/white"
+            android:text="Insights"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            />
+
         <include
             android:id="@+id/include"
             layout="@layout/recommendations_chart"
@@ -191,12 +205,19 @@ android:background="@color/white">
 
         <TextView
             android:id="@+id/news_header"
-            android:layout_width="match_parent"
-            android:layout_height="38dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/white"
             android:text="News"
-            android:layout_marginTop="10dp"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
             app:layout_constraintTop_toBottomOf="@+id/include_2"
-            android:background="@color/white"/>
+            />
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/news_RecyclerView"
@@ -205,9 +226,10 @@ android:background="@color/white">
             android:background="@color/white"
             android:nestedScrollingEnabled="false"
             />
-
     </LinearLayout>
 
-    </LinearLayout>
+
+
+<!--    </LinearLayout>-->
 </androidx.core.widget.NestedScrollView>
 
