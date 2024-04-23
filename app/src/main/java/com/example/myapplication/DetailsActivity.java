@@ -1,12 +1,15 @@
 package com.example.myapplication;
 
 
+import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -30,6 +33,8 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.ItemTouchHelper;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
 
 import com.android.volley.Request;
@@ -64,7 +69,7 @@ import android.util.DisplayMetrics;
 import android.widget.Toast;
 
 
-public class DetailsActivity extends AppCompatActivity {
+public class DetailsActivity extends AppCompatActivity implements NewsRecyclerViewInterface{
 
     private static final String BASE_URL = "http://10.0.2.2:8080";
     private Double curBalance;
@@ -93,6 +98,9 @@ public class DetailsActivity extends AppCompatActivity {
     Double totalCostToBuy = 0.00;
     Integer quantityToSell = 0;
     Double totalCostToSell = 0.00;
+
+    //related to news section
+    ArrayList<NewsItem> newsArray;
 
 
 
@@ -129,6 +137,7 @@ public class DetailsActivity extends AppCompatActivity {
         getBalanceData();
         getCompanyData(ticker);
         getQuoteData(ticker);
+        getNewsData(ticker);
 
         initStarButton(ticker);
         initTradeSection(ticker);
@@ -956,4 +965,101 @@ public class DetailsActivity extends AppCompatActivity {
         queue.add(stringRequest);
     }
     /********************* End of favorite stocks methods *******************************/
+    /********************* Related to News Section ***************************************/
+    private void getNewsData(String tickerSymbol){
+        String newsUrl = BASE_URL + "/search-news/" + tickerSymbol;
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        newsArray = new ArrayList<>(); // Clear the previous results
+
+        // Clear the adapter before fetching new data ????
+
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, newsUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        Log.d("DetailsActivity", "news response is: " + response);
+
+                        try {
+                            JSONArray jsonArray = new JSONArray(response);
+
+                            int newsCounter = 0;
+
+                            for (int i = 0; i < jsonArray.length() && newsCounter < 20; i++) {
+                                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                                //Checking if all values are present and not null
+                                if (jsonObject.has("image") && !jsonObject.isNull("image") && !jsonObject.getString("image").isEmpty() &&
+                                    jsonObject.has("headline") && !jsonObject.isNull("headline") && !jsonObject.getString("headline").isEmpty() &&
+                                    jsonObject.has("datetime") && !jsonObject.isNull("datetime") && jsonObject.getLong("datetime") > 0 &&
+                                    jsonObject.has("url") && !jsonObject.isNull("url") && !jsonObject.getString("url").isEmpty() &&
+                                    jsonObject.has("summary") && !jsonObject.isNull("summary") && !jsonObject.getString("summary").isEmpty() &&
+                                    jsonObject.has("source") && !jsonObject.isNull("source") && !jsonObject.getString("source").isEmpty() ) {
+
+                                    long datetime = jsonObject.getLong("datetime");
+                                    String headline = jsonObject.getString("headline");
+
+                                    String imageUrlString = jsonObject.getString("image");
+                                    Uri imageUri = Uri.parse(imageUrlString);
+
+                                    String url = jsonObject.getString("url");
+                                    String summary = jsonObject.getString("summary");
+                                    String source = jsonObject.getString("source");
+
+                                    //Creating a new NewsItem instance
+                                    NewsItem newsItem = new NewsItem(datetime, headline, imageUri, url, summary, source);
+
+                                    newsCounter++;
+                                    newsArray.add(newsItem);
+                                }
+
+                            }
+
+//                            for (NewsItem newsItem : newsArray){
+//                                   Log.d("DetailsActivity", "News Item is: " + newsItem.toString());
+//                                }
+//
+//                            int numberOfItems = newsArray.size();
+//                            Log.d("DetailsActivity", "Number of items in newsArray: " + numberOfItems);
+
+                            //creating adapter after we have news data array ready
+                            RecyclerView newsRecyclerView = findViewById(R.id.news_RecyclerView);
+                            NewsRecyclerViewAdapter newsRecyclerViewAdapter = new NewsRecyclerViewAdapter(DetailsActivity.this, newsArray, DetailsActivity.this);
+                            newsRecyclerView.setAdapter(newsRecyclerViewAdapter);
+                            newsRecyclerView.setLayoutManager(new LinearLayoutManager(DetailsActivity.this));
+
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.e("DetailsActivity", "Error parsing JSON: " + e.getMessage());
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                String errorMessage = "Error fetching news data " + volleyError.getMessage();
+                Log.d("DetailsActivity", errorMessage);
+            }
+        });
+
+            queue.add(stringRequest);
+
+    }
+
+    @Override
+    public void onItemClick(int position) {
+        NewsItem clickedNewsItem = newsArray.get(position);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("News Header");
+        builder.setMessage(clickedNewsItem.getHeadline());
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+        builder.show();
+    }
+
+
 }

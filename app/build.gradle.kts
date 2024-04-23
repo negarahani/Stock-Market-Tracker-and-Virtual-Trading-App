@@ -72,11 +72,7 @@ dependencies {
     debugImplementation(libs.ui.test.manifest)
     implementation("com.github.luizgrp:SectionedRecyclerViewAdapter:v3.2.0")
     implementation ("com.google.code.gson:gson:2.8.8")
-
-
-
-
-
+    implementation ("com.squareup.picasso:picasso:2.8")
 
 
 }
