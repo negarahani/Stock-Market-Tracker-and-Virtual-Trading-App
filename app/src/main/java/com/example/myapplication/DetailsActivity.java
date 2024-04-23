@@ -1,12 +1,11 @@
 package com.example.myapplication;
 
 
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -23,6 +22,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -31,8 +32,6 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager2.widget.ViewPager2;
@@ -42,7 +41,6 @@ import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.RequestFuture;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.tabs.TabLayout;
@@ -54,16 +52,10 @@ import com.google.gson.reflect.TypeToken;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.w3c.dom.Text;
 
 import java.lang.reflect.Type;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.ExecutionException;
 
 import android.util.DisplayMetrics;
 import android.widget.Toast;
@@ -101,6 +93,10 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
 
     //related to news section
     ArrayList<NewsItem> newsArray;
+    //related to progress bar
+    private ProgressBar progressBar;
+    private LinearLayout contentLayout;
+    private int requestCount = 0;
 
 
 
@@ -132,6 +128,12 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
             return insets;
         });
 
+        /******************progress bar setup *******************************/
+        progressBar = findViewById(R.id.details_progress_bar);
+        progressBar.setMax(3); // number of API calls
+        progressBar.setProgress(0);
+
+        requestCount = 3; // number of API calls
 
         /************** other methods to get data from backend *************/
         getBalanceData();
@@ -643,6 +645,9 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
                             JSONObject jsonObject = jsonArray.getJSONObject(0);
                             curBalance = jsonObject.getDouble("cash_balance");
 
+                            onRequestCompleted();
+
+
                         } catch (JSONException e) {
                             String errorMessage = "Error parsing JSON: " + e.getMessage();
 
@@ -654,6 +659,8 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
             public void onErrorResponse(VolleyError error) {
                 String errorMessage = "Error fetching balance: " + error.getMessage();
                 Log.d("MainActivity", errorMessage);
+                onRequestCompleted();
+
             }
         });
         queue.add(stringRequest);
@@ -796,6 +803,8 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
 
                             curCompanyName = name; //get company name for watchlist
 
+                            onRequestCompleted();
+
                         } catch (JSONException e) {
                             // JSON parsing error
                             String errorMessage = "Error parsing JSON: " + e.getMessage();
@@ -808,6 +817,8 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
                 // Handling errors
                 String errorMessage = "Error fetching companyData: " + error.getMessage();
                 Log.d("DetailsActivity", errorMessage);
+                onRequestCompleted();
+
             }
         });
         queue.add(stringRequest);
@@ -846,6 +857,9 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
                             currentPriceText.setText("$" + curPriceStr);
                             changeText.setText("$" + changeValStr + " (" + changePercentStr + "%)");
 
+                            onRequestCompleted();
+
+
                         } catch (JSONException e) {
                             // JSON parsing error
                             String errorMessage = "Error parsing JSON: " + e.getMessage();
@@ -858,6 +872,8 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
                 // Handling errors
                 String errorMessage = "Error fetching quote Data: " + error.getMessage();
                 Log.d("DetailsActivity", errorMessage);
+                onRequestCompleted();
+
             }
         });
         queue.add(stringRequest);
@@ -1049,17 +1065,110 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
     @Override
     public void onItemClick(int position) {
         NewsItem clickedNewsItem = newsArray.get(position);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("News Header");
-        builder.setMessage(clickedNewsItem.getHeadline());
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+
+        final Dialog dialog = new Dialog(DetailsActivity.this);
+        dialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+
+        dialog.setContentView(R.layout.news_dialogue);
+
+        //setting the dialogue width to 90% of the screen
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        int dialogWidth = (int) (displayMetrics.widthPixels * 0.90);
+        WindowManager.LayoutParams layoutParams = new WindowManager.LayoutParams();
+        layoutParams.copyFrom(dialog.getWindow().getAttributes());
+        layoutParams.width = dialogWidth;
+        dialog.getWindow().setAttributes(layoutParams);
+
+        // set the custom dialog components - text, image and button
+        TextView newsSourceDialogue = dialog.findViewById(R.id.news_source_dialogue);
+        newsSourceDialogue.setText(clickedNewsItem.getSource());
+
+        TextView newsDateDialogue = dialog.findViewById(R.id.news_date_dialogue);
+        newsDateDialogue.setText(clickedNewsItem.getFormattedDate());
+
+        TextView newsTitleDialogue = dialog.findViewById(R.id.news_title_dialogue);
+        newsTitleDialogue.setText(clickedNewsItem.getHeadline());
+
+        TextView newsDescription = dialog.findViewById(R.id.news_description);
+        newsDescription.setText(clickedNewsItem.getSummary());
+
+        ImageButton chromeButton = dialog.findViewById(R.id.chrome_button);
+        chromeButton.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_SEND);
+                intent.setData(Uri.parse(clickedNewsItem.getUrl()));
+
+                //Set the package name of chrome to ensure it opens in Chrome if available
+                intent.setPackage("com.android.chrome");
+
+                //Checking if Chrome is installed
+                PackageManager packageManager = getPackageManager();
+                if (intent.resolveActivity(packageManager) != null) {
+                    startActivity(intent);
+                } else {
+                   //open in default browser
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(clickedNewsItem.getUrl())));
+                }
             }
         });
-        builder.show();
+
+        ImageButton twitterButton = dialog.findViewById(R.id.twitter_button);
+        twitterButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+//                Source of the next 3 lines: StackOverflow, Link: https://stackoverflow.com/questions/6814268/android-share-on-facebook-twitter-mail-ecc
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_TEXT, clickedNewsItem.getUrl());
+
+                shareIntent.setPackage("com.twitter.android");
+
+                PackageManager packageManager = getPackageManager();
+                if (shareIntent.resolveActivity(packageManager) != null) {
+                    startActivity(shareIntent);
+                } else {
+                    // If twitter not installed, open it in browser
+                    Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://twitter.com/intent/tweet?text=" + clickedNewsItem.getUrl()));
+                    startActivity(browserIntent);
+                }
+            }
+        });
+
+
+        ImageButton fbButton = dialog.findViewById(R.id.facebook_button);
+        fbButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Source of the next 3 lines: StackOverflow, Link: https://stackoverflow.com/questions/6814268/android-share-on-facebook-twitter-mail-ecc
+                Intent shareIntent = new Intent(Intent.ACTION_SEND);
+                shareIntent.setType("text/plain");
+                shareIntent.putExtra(Intent.EXTRA_TEXT, clickedNewsItem.getUrl());
+
+
+                shareIntent.setPackage("com.facebook.katana");
+
+                PackageManager packageManager = getPackageManager();
+                if (shareIntent.resolveActivity(packageManager) != null) {
+                    startActivity(shareIntent);
+                } else {
+                    // if not installed, open facebook in browser
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.facebook.com/sharer/sharer.php?u=" + clickedNewsItem.getUrl())));
+                }
+            }
+        });
+
+        dialog.show();
     }
 
 
+    private void onRequestCompleted() {
+        requestCount--;
+        progressBar.setProgress(3 - requestCount);
+        if (requestCount == 0) {
+            progressBar.setVisibility(View.GONE);
+            findViewById(R.id.content_layout).setVisibility(View.VISIBLE);
+        }
+    }
 }

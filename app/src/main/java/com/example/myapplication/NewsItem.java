@@ -3,7 +3,10 @@ package com.example.myapplication;
 import android.net.Uri;
 import android.text.format.DateUtils;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Locale;
+
 public class NewsItem {
 
     private long datetime;
@@ -33,6 +36,10 @@ public class NewsItem {
         return DateUtils.getRelativeTimeSpanString(datetime * 1000, now, DateUtils.HOUR_IN_MILLIS);
     }
 
+    public String getFormattedDate() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMMM dd, yyyy", Locale.getDefault());
+        return dateFormat.format(new Date(datetime * 1000));
+    }
     public String getHeadline() {
         return headline;
     }
