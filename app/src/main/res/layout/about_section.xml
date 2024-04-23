@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TableLayout
+        android:id="@+id/tableLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dp"
+        android:background="@color/white">
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/about_ipo_title"
+                android:layout_width="130dp"
+                android:layout_height="wrap_content"
+                android:text="IPO Start Date" />
+
+            <TextView
+                android:id="@+id/about_ipo_text"
+                android:layout_width="230dp"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/about_industry_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Industry" />
+
+            <TextView
+                android:id="@+id/about_industry_text"
+                android:layout_width="230dp"
+                android:layout_height="wrap_content"
+                android:text="TextView" />
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/about_webpage_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Webpage" />
+
+            <TextView
+                android:id="@+id/about_webpage_text"
+                android:layout_width="230dp"
+                android:layout_height="wrap_content"
+                android:autoLink="web"
+                android:text="TextView" />
+
+        </TableRow>
+
+
+    </TableLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginLeft="15dp">
+
+        <TextView
+            android:id="@+id/about_peers_title"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:text="Company Peers" />
+
+    <HorizontalScrollView
+        android:layout_width="230dp"
+        android:layout_height="fill_parent"
+        >
+
+        <TextView
+            android:id="@+id/about_peers_text"
+            android:layout_width="300dp"
+            android:layout_height="wrap_content"
+            android:scrollHorizontally="true"
+            android:text="Just a long text" />
+
+    </HorizontalScrollView>
+
+    </LinearLayout>
+</LinearLayout>

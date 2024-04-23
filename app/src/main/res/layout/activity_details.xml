@@ -17,7 +17,8 @@ android:background="@color/white">
         android:orientation="vertical"
         android:id="@+id/main"
         tools:context=".DetailsActivity"
-        android:background="@color/white">
+        android:background="@color/white"
+        >
 
 
         <include
@@ -27,11 +28,12 @@ android:background="@color/white">
         <ProgressBar
             android:id="@+id/details_progress_bar"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_gravity="center"
-            app:layout_constraintTop_toTopOf="@id/details_toolbar"
-            android:layout_marginTop="100dp"
-            />
+            android:layout_marginTop="270dp"
+            android:layout_marginBottom="380dp"
+            android:indeterminateTint="@color/custom_progress_color"
+            app:layout_constraintTop_toTopOf="@id/details_toolbar" />
 
     <LinearLayout
         android:id="@+id/content_layout"
@@ -39,6 +41,7 @@ android:background="@color/white">
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:visibility="gone">
+
 
         <TableLayout
             android:id="@+id/tableLayout"
@@ -84,6 +87,7 @@ android:background="@color/white">
 
         </TableLayout>
 
+
         <!--   my spwipable tabls     -->
         <androidx.viewpager2.widget.ViewPager2
             android:id="@+id/viewPager"
@@ -108,123 +112,58 @@ android:background="@color/white">
             android:id="@+id/Portfolio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Portfolio"
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="50dp"
             android:layout_marginBottom="10dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tabLayout"
             android:background="@color/white"
-             />
-
-        <TableLayout
-            android:id="@+id/tableLayout2"
-            android:layout_width="278dp"
-            android:layout_height="97dp"
-            android:layout_marginStart="20dp"
-            android:layout_marginTop="10dp"
+            android:text="Portfolio"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/Portfolio"
-            android:background="@color/white">
+            app:layout_constraintTop_toBottomOf="@id/tabLayout" />
 
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/sharesOwnedTitle"
-                    android:layout_width="163dp"
-                    android:layout_height="wrap_content"
-                    android:text="Shares Owned: " />
+        <include
+            layout="@layout/details_portfolio_section"
+            />
 
-                <TextView
-                    android:id="@+id/sharesOwnedText"
-                    android:layout_width="114dp"
-                    android:layout_height="wrap_content"
-                    android:text="TextView" />
-            </TableRow>
 
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/avgCostShareTitle"
-                    android:layout_width="163dp"
-                    android:layout_height="wrap_content"
-                    android:text="Avg. Cost / Share: " />
-
-                <TextView
-                    android:id="@+id/avgCostShareText"
-                    android:layout_width="114dp"
-                    android:layout_height="wrap_content"
-                    android:text="TextView" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/totalCostTitle"
-                    android:layout_width="163dp"
-                    android:layout_height="wrap_content"
-                    android:text="Total Cost: " />
-
-                <TextView
-                    android:id="@+id/totalCostText"
-                    android:layout_width="114dp"
-                    android:layout_height="wrap_content"
-                    android:text="TextView" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/changeTitleTrade"
-                    android:layout_width="163dp"
-                    android:layout_height="wrap_content"
-                    android:text="Change: " />
-
-                <TextView
-                    android:id="@+id/changeTextTrade"
-                    android:layout_width="114dp"
-                    android:layout_height="wrap_content"
-                    android:text="TextView" />
-            </TableRow>
-
-            <TableRow
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <TextView
-                    android:id="@+id/marketValueTitle"
-                    android:layout_width="163dp"
-                    android:layout_height="wrap_content"
-                    android:text="Market Value: " />
-
-                <TextView
-                    android:id="@+id/marketValueText"
-                    android:layout_width="114dp"
-                    android:layout_height="wrap_content"
-                    android:text="TextView" />
-            </TableRow>
-
-        </TableLayout>
-
-        <Button
-            android:id="@+id/tradeButton"
+        <TextView
+            android:id="@+id/Stats"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="54dp"
-            android:backgroundTint="#4CAF50"
-            android:text="TRADE"
-            android:textColor="#FFFFFF"
-            app:layout_constraintStart_toEndOf="@+id/tableLayout2"
-            app:layout_constraintTop_toBottomOf="@+id/tableLayout" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/white"
+            android:text="Stats"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+             />
 
+        <include
+            layout="@layout/stats_section"
+            />
+
+        <TextView
+            android:id="@+id/About"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="10dp"
+            android:background="@color/white"
+            android:text="About"
+            android:textColor="#000000"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            />
+
+        <include
+            layout="@layout/about_section"
+            />
 
         <include
             android:id="@+id/include"
@@ -266,6 +205,7 @@ android:background="@color/white">
             android:background="@color/white"
             android:nestedScrollingEnabled="false"
             />
+
     </LinearLayout>
 
     </LinearLayout>

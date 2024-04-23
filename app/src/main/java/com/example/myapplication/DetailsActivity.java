@@ -11,8 +11,13 @@ import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.method.LinkMovementMethod;
+import android.text.style.ClickableSpan;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 import android.webkit.WebSettings;
@@ -27,6 +32,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
@@ -98,6 +104,8 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
     private LinearLayout contentLayout;
     private int requestCount = 0;
 
+    OnBackPressedCallback callback;
+
 
 
     @Override
@@ -138,6 +146,7 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
         /************** other methods to get data from backend *************/
         getBalanceData();
         getCompanyData(ticker);
+        getCompanyPeersData(ticker);
         getQuoteData(ticker);
         getNewsData(ticker);
 
@@ -785,6 +794,11 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
         TextView currentPrice = findViewById(R.id.current_price);
         TextView change = findViewById(R.id.change);
 
+        //related to about section
+        TextView ipoText = findViewById(R.id.about_ipo_text);
+        TextView industryText = findViewById(R.id.about_industry_text);
+        TextView webpageText = findViewById(R.id.about_webpage_text);
+
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -802,6 +816,16 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
                             companyText.setText(name);
 
                             curCompanyName = name; //get company name for watchlist
+
+                            //related to about section
+                            String ipo = jsonObject.getString("ipo");
+                            String industry = jsonObject.getString("finnhubIndustry");
+                            String webpage = jsonObject.getString("weburl");
+
+                            ipoText.setText(ipo);
+                            industryText.setText(industry);
+                            webpageText.setText(webpage);
+
 
                             onRequestCompleted();
 
@@ -824,12 +848,75 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
         queue.add(stringRequest);
     }
 
+    private void getCompanyPeersData(String tickerSymbol){
+        String peersUrl = BASE_URL + "/search-peers/" + tickerSymbol;
+        RequestQueue queue = Volley.newRequestQueue(this);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, peersUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONArray peersArray = new JSONArray(response);
+                            String peersText = "";
+                            for (int i = 0; i < peersArray.length(); i++) {
+                                String peer = peersArray.getString(i);
+                                peersText += peer + ", ";
+                            }
+                            peersText = peersText.substring(0, peersText.length() - 2); //remove trailing comma and space
+                            TextView peersTextView = findViewById(R.id.about_peers_text);
+                            peersTextView.setSelected(true);
+
+                            peersTextView.setText(peersText);
+
+                            makePeersClickable();
+
+
+                        } catch (JSONException e) {
+                            Log.e("Error", "Error parsing peers data");
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.e("Error", "Error fetching peers data");
+            }
+        });
+        queue.add(stringRequest);
+    }
+
+    private void makePeersClickable(){
+        TextView peersTextView = findViewById(R.id.about_peers_text);
+        String peersText = peersTextView.getText().toString();
+        SpannableString spannableString = new SpannableString(peersText);
+        String[] peers = peersText.split(", ");
+        for (final String peer : peers) {
+            int start = peersText.indexOf(peer);
+            int end = start + peer.length();
+            spannableString.setSpan(new ClickableSpan() {
+                @Override
+                public void onClick(View widget) {
+                    Intent intent = new Intent(DetailsActivity.this, DetailsActivity.class);
+                    intent.putExtra("inputValue", peer);
+                    startActivity(intent);
+                }
+            }, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        peersTextView.setText(spannableString);
+        peersTextView.setMovementMethod(LinkMovementMethod.getInstance());
+    }
+
     private void getQuoteData(String tickerSymbol) {
         String quoteUrl = BASE_URL + "/search-quote/" + tickerSymbol;
 
 
         TextView currentPriceText = findViewById(R.id.current_price);
         TextView changeText = findViewById(R.id.change);
+
+        //related to stats section
+        TextView openPriceText = findViewById(R.id.stats_open_rpice);
+        TextView highPriceText = findViewById(R.id.stats_high_rpice);
+        TextView lowPriceText = findViewById(R.id.stats_low_price);
+        TextView prevCloseText = findViewById(R.id.stats_prev_close);
 
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -856,6 +943,22 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
 
                             currentPriceText.setText("$" + curPriceStr);
                             changeText.setText("$" + changeValStr + " (" + changePercentStr + "%)");
+
+                            //related to stats section
+                            double openPrice = jsonObject.getDouble("o");
+                            double highPrice = jsonObject.getDouble("h");
+                            double lowPrice = jsonObject.getDouble("l");
+                            double prevClose = jsonObject.getDouble("pc");
+
+                            String openPriceStr = String.valueOf(openPrice);
+                            String highPriceStr = String.valueOf(highPrice);
+                            String lowPriceStr  = String.valueOf(lowPrice);
+                            String prevCloseStr = String.valueOf(prevClose);
+
+                            openPriceText.setText("Open Price : $" + openPriceStr);
+                            highPriceText.setText("High Price : $" + openPriceStr);
+                            lowPriceText.setText("Low Price : $" + lowPriceStr);
+                            prevCloseText.setText("Prev. Close : $" + prevCloseStr);
 
                             onRequestCompleted();
 
@@ -1171,4 +1274,18 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
             findViewById(R.id.content_layout).setVisibility(View.VISIBLE);
         }
     }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+
 }

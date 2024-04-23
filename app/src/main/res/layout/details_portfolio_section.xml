@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+    <LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+
+        <TableLayout
+            android:id="@+id/tableLayout2"
+            android:layout_width="278dp"
+            android:layout_height="97dp"
+            android:layout_marginLeft="15dp"
+            android:background="@color/white">
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/sharesOwnedTitle"
+                    android:layout_width="163dp"
+                    android:layout_height="wrap_content"
+                    android:text="Shares Owned: " />
+
+                <TextView
+                    android:id="@+id/sharesOwnedText"
+                    android:layout_width="114dp"
+                    android:layout_height="wrap_content"
+                    android:text="TextView" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/avgCostShareTitle"
+                    android:layout_width="163dp"
+                    android:layout_height="wrap_content"
+                    android:text="Avg. Cost / Share: " />
+
+                <TextView
+                    android:id="@+id/avgCostShareText"
+                    android:layout_width="114dp"
+                    android:layout_height="wrap_content"
+                    android:text="TextView" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/totalCostTitle"
+                    android:layout_width="163dp"
+                    android:layout_height="wrap_content"
+                    android:text="Total Cost: " />
+
+                <TextView
+                    android:id="@+id/totalCostText"
+                    android:layout_width="114dp"
+                    android:layout_height="wrap_content"
+                    android:text="TextView" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/changeTitleTrade"
+                    android:layout_width="163dp"
+                    android:layout_height="wrap_content"
+                    android:text="Change: " />
+
+                <TextView
+                    android:id="@+id/changeTextTrade"
+                    android:layout_width="114dp"
+                    android:layout_height="wrap_content"
+                    android:text="TextView" />
+            </TableRow>
+
+            <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/marketValueTitle"
+                    android:layout_width="163dp"
+                    android:layout_height="wrap_content"
+                    android:text="Market Value: " />
+
+                <TextView
+                    android:id="@+id/marketValueText"
+                    android:layout_width="114dp"
+                    android:layout_height="wrap_content"
+                    android:text="TextView" />
+            </TableRow>
+
+        </TableLayout>
+
+        <Button
+            android:id="@+id/tradeButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:backgroundTint="#4CAF50"
+            android:text="TRADE"
+            android:textColor="#FFFFFF"
+
+            />
+
+    </LinearLayout>
