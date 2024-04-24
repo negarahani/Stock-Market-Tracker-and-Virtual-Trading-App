@@ -11,36 +11,36 @@ android:layout_height="wrap_content"
 android:layout_weight="1"
 android:fillViewport="true"
 android:background="@color/white">
-<!--    <LinearLayout-->
-<!--        android:layout_height="match_parent"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:orientation="vertical"-->
-<!--        android:id="@+id/main"-->
-<!--        tools:context=".DetailsActivity"-->
-<!--        android:background="@color/white"-->
-<!--        >-->
+    <LinearLayout
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"
+        android:orientation="vertical"
+        android:id="@+id/main"
+        tools:context=".DetailsActivity"
+        android:background="@color/white"
+        >
 
 
-<!--        <include-->
-<!--            android:id="@+id/details_toolbar"-->
-<!--            layout="@layout/custom_toolbar" />-->
+        <include
+            android:id="@+id/details_toolbar"
+            layout="@layout/custom_toolbar" />
 
-<!--        <ProgressBar-->
-<!--            android:id="@+id/details_progress_bar"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="match_parent"-->
-<!--            android:layout_gravity="center"-->
-<!--            android:layout_marginTop="270dp"-->
-<!--            android:layout_marginBottom="380dp"-->
-<!--            android:indeterminateTint="@color/custom_progress_color"-->
-<!--            app:layout_constraintTop_toTopOf="@id/details_toolbar" />-->
+        <ProgressBar
+            android:id="@+id/details_progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="center"
+            android:layout_marginTop="270dp"
+            android:layout_marginBottom="380dp"
+            android:indeterminateTint="@color/custom_progress_color"
+            app:layout_constraintTop_toTopOf="@id/details_toolbar" />
 
     <LinearLayout
         android:id="@+id/content_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-<!--        android:visibility="gone">-->
+        android:visibility="gone">
 
 
         <TableLayout
@@ -180,12 +180,15 @@ android:background="@color/white">
             />
 
         <include
+            layout="@layout/insights_section"/>
+
+        <include
             android:id="@+id/include"
             layout="@layout/recommendations_chart"
             android:layout_width="400dp"
             android:layout_height="403dp"
             android:layout_marginStart="5dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="20dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/include_2"
             android:background="@color/white"
@@ -230,6 +233,6 @@ android:background="@color/white">
 
 
 
-<!--    </LinearLayout>-->
+    </LinearLayout>
 </androidx.core.widget.NestedScrollView>
 

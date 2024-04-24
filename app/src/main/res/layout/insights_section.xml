@@ -19,120 +19,163 @@
             android:text="Social Sentiments"
 
             />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+
+        <TableLayout
+            android:id="@+id/tableLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:background="@color/white">
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/insights_company_text"
+                    android:layout_width="120dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/border_background"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:text="TextView"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="120dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/border_background"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:text="MSPR"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="120dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/border_background"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:text="Change"
+                    android:textStyle="bold" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="120dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/border_background"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:text="Total"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/mspr_total"
+                    android:layout_width="120dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/border_background_2"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:text="mspr_total" />
+                <TextView
+                    android:id="@+id/change_total"
+                    android:layout_width="120dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/border_background_2"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:text="change_total" />
+
+            </TableRow>
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="120dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/border_background"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:text="Positive"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/mspr_positive"
+                    android:layout_width="120dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/border_background_2"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:text="mspr_positive" />
+
+                <TextView
+                    android:id="@+id/change_positive"
+                    android:layout_width="120dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/border_background_2"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:text="change_positive" />
+
+
+            </TableRow>
+
+
+            <TableRow
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:layout_width="120dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/border_background"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:text="Negative"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/mspr_negative"
+                    android:layout_width="120dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/border_background_2"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:text="mspr_negative" />
+
+                <TextView
+                    android:id="@+id/change_negative"
+                    android:layout_width="120dp"
+                    android:layout_height="30dp"
+                    android:background="@drawable/border_background_2"
+                    android:gravity="center_vertical"
+                    android:paddingLeft="8dp"
+                    android:text="change_negative" />
+
+
+            </TableRow>
+
+
+        </TableLayout>
+
 
     </LinearLayout>
 
-    <TableLayout
-        android:id="@+id/tableLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:background="@color/white">
 
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/insights_company_text"
-                android:layout_width="120dp"
-                android:layout_height="30dp"
-                android:background="@drawable/border_background"
-                android:gravity="center_vertical"
-                android:paddingLeft="8dp"
-                android:text="TextView"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="120dp"
-                android:layout_height="30dp"
-                android:background="@drawable/border_background"
-                android:gravity="center_vertical"
-                android:paddingLeft="8dp"
-                android:text="MSPR"
-                android:textStyle="bold" />
-
-            <TextView
-                android:layout_width="120dp"
-                android:layout_height="30dp"
-                android:background="@drawable/border_background"
-                android:gravity="center_vertical"
-                android:paddingLeft="8dp"
-                android:text="Change"
-                android:textStyle="bold" />
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="Total" />
-
-            <TextView
-                android:id="@+id/msrp_total"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="msrp_total" />
-            <TextView
-                android:id="@+id/change_total"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="change_total" />
-
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="Positive" />
-
-            <TextView
-                android:id="@+id/msrp_positive"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="msrp_positive" />
-
-            <TextView
-                android:id="@+id/change_positive"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="change_positive" />
-
-
-        </TableRow>
-
-
-        <TableRow>
-            <TextView
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="Negative" />
-
-            <TextView
-                android:id="@+id/msrp_negative"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="msrp_negative" />
-
-            <TextView
-                android:id="@+id/change_negative"
-                android:layout_width="120dp"
-                android:layout_height="wrap_content"
-                android:text="change_negative" />
-
-
-        </TableRow>
-
-
-    </TableLayout>
 
 
 </LinearLayout>

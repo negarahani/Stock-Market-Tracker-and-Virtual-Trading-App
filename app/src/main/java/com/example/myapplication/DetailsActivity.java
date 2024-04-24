@@ -148,6 +148,7 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
         getCompanyData(ticker);
         getCompanyPeersData(ticker);
         getQuoteData(ticker);
+        getSentimentsData(ticker);
         getNewsData(ticker);
 
         initStarButton(ticker);
@@ -799,6 +800,9 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
         TextView industryText = findViewById(R.id.about_industry_text);
         TextView webpageText = findViewById(R.id.about_webpage_text);
 
+        TextView insightsCompanyText = findViewById(R.id.insights_company_text);
+
+
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -814,6 +818,7 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
                             String name = jsonObject.getString("name");
                             tickerText.setText(ticker);
                             companyText.setText(name);
+                            insightsCompanyText.setText(name);
 
                             curCompanyName = name; //get company name for watchlist
 
@@ -980,6 +985,89 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
             }
         });
         queue.add(stringRequest);
+    }
+
+    private void getSentimentsData(String tickerSymbol){
+        String sentimentsUrl = BASE_URL + "/search-sentiments/" + tickerSymbol;
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, sentimentsUrl, null,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        try {
+                            JSONArray dataArray = response.getJSONArray("data");
+                            Log.d("DetailsActivity","sentiments data is" + dataArray);
+                            processSentimentsData(dataArray);
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        error.printStackTrace();
+                    }
+                });
+
+        queue.add(jsonObjectRequest);
+
+    }
+
+    private void processSentimentsData(JSONArray dataArray) {
+        double totalMSPR = 0;
+        double positiveMSPR = 0;
+        double negativeMSPR = 0;
+        double totalChange = 0;
+        double positiveChange = 0;
+        double negativeChange = 0;
+
+        for (int i = 0; i < dataArray.length(); i++) {
+            try {
+                JSONObject item = dataArray.getJSONObject(i);
+                Log.d("DetailsActivity", "sentiments item is: " + item);
+
+                // MSPR calculation
+                double mspr = item.getDouble("mspr");
+                totalMSPR += mspr;
+                if (mspr > 0) {
+                    positiveMSPR += mspr;
+                } else if (mspr < 0) {
+                    negativeMSPR += mspr;
+                }
+
+                // Change Calculation
+                double change = item.getDouble("change");
+                totalChange += change;
+                if (change > 0) {
+                    positiveChange += change;
+                } else if (change < 0) {
+                    negativeChange += change;
+                }
+
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+
+        TextView msprTotalText = findViewById(R.id.mspr_total);
+        TextView msprPositiveText = findViewById(R.id.mspr_positive);
+        TextView msprNegativeText = findViewById(R.id.mspr_negative);
+
+        TextView changeTotalText = findViewById(R.id.change_total);
+        TextView changePositiveText = findViewById(R.id.change_positive);
+        TextView changeNegativeText = findViewById(R.id.change_negative);
+
+        msprTotalText.setText(String.format("%.2f", totalMSPR));
+        msprPositiveText.setText(String.format("%.2f", positiveMSPR));
+        msprNegativeText.setText(String.format("%.2f", negativeMSPR));
+
+        changeTotalText.setText(String.format("%.2f", totalChange));
+        changePositiveText.setText(String.format("%.2f", positiveChange));
+        changeNegativeText.setText(String.format("%.2f", negativeChange));
+
     }
     /*********************** related to favorite stocks *************************/
     private void initStarButton(String tickerSymbol){
