@@ -69,7 +69,8 @@ import android.widget.Toast;
 
 public class DetailsActivity extends AppCompatActivity implements NewsRecyclerViewInterface{
 
-    private static final String BASE_URL = "http://10.0.2.2:8080";
+//    private static final String BASE_URL = "http://10.0.2.2:8080";
+    private static final String BASE_URL = "https://mywebtech4-729326.lm.r.appspot.com/";
     private Double curBalance;
     private List<FavoriteStock> myFavoriteStocks = new ArrayList<>(); //you may change this later!
     private List<PortfolioStock> myPortfolioStocks = new ArrayList<>(); //you may change this later!

@@ -23,7 +23,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class HistoricalChartFragment extends Fragment {
-    private static final String BASE_URL = "http://10.0.2.2:8080";
+//    private static final String BASE_URL = "http://10.0.2.2:8080";
+private static final String BASE_URL = "https://mywebtech4-729326.lm.r.appspot.com/";
     private static final String ARG_TICKER = "ticker";
 
     private String curTicker;

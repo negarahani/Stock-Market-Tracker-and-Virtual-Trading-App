@@ -45,7 +45,8 @@ import io.github.luizgrp.sectionedrecyclerviewadapter.SectionedRecyclerViewAdapt
 
 public class MainActivity extends AppCompatActivity{
 
-    private static final String BASE_URL = "http://10.0.2.2:8080";
+//    private static final String BASE_URL = "http://10.0.2.2:8080";
+    private static final String BASE_URL = "https://mywebtech4-729326.lm.r.appspot.com/";
     AutoCompleteTextView autoCompleteTextView;
 
     //related to Portfolio
