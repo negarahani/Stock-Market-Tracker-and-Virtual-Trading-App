@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void launchDetailsActivity(String queryTicker) {
+        Log.d("Details Activity", "new DetailsActivity launched!");
         Intent i = new Intent(this, DetailsActivity.class);
         i.putExtra("inputValue", queryTicker);
         startActivity(i);

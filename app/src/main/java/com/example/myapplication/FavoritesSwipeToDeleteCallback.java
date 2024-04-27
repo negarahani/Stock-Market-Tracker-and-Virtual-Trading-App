@@ -32,7 +32,7 @@ public class FavoritesSwipeToDeleteCallback extends ItemTouchHelper.Callback {
     private final SectionedRecyclerViewAdapter mAdapter;
     private final Context mContext;
     private final List<FavoriteStock> mFavoriteStocks; // Reference to the ArrayList
-    private static final String BASE_URL = "http://10.0.2.2:8080";
+    private static final String BASE_URL = "https://mywebtech4-729326.lm.r.appspot.com/";
 
     private Drawable deleteDrawable;
     private final int intrinsicWidth;
