@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity{
                             JSONArray jsonArray = new JSONArray(response);
                             JSONObject jsonObject = jsonArray.getJSONObject(0);
                             double cashBalance = jsonObject.getDouble("cash_balance");
-                            String formattedBalance = String.format("%.2f", cashBalance);
+                            String formattedBalance = "$" + String.format("%.2f", cashBalance);
                             balanceText.setText(formattedBalance);
                         } catch (JSONException e) {
                             String errorMessage = "Error parsing JSON: " + e.getMessage();

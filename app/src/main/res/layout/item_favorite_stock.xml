@@ -38,51 +38,64 @@
 
         </LinearLayout>
 
-
+<!--        used as a spacer-->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginStart="155dp"
+            android:layout_marginRight="8dp"
+
            >
 
-            <TextView
-                android:id="@+id/currentPriceText_fav"
-                android:layout_width="150dp"
+            <LinearLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="curPrice"
-                android:textAlignment="viewEnd"
-                android:textColor="@android:color/black"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:layout_marginRight="5dp"/>
+                android:orientation="vertical"
+                android:layout_marginRight="5dp"
+                >
 
-            <TextView
-                android:id="@+id/changeText_fav"
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:text="change"
-                android:textAlignment="viewEnd"
-                android:textColor="#454343"
-                android:textSize="14sp"
-                android:textStyle="bold" />
+                <TextView
+                    android:id="@+id/currentPriceText_fav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="curPrice"
+                    android:textAlignment="textEnd"
+                    android:layout_gravity="end"
+                    android:textColor="@android:color/black"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
 
+                <TextView
+                    android:id="@+id/changeText_fav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="change"
+                    android:textAlignment="viewEnd"
+                    android:layout_gravity="end"
+                    android:textColor="#454343"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+            </LinearLayout>
+
+
+
+            <ImageButton
+                android:id="@+id/favButton"
+                android:src="@drawable/right_arrow"
+                android:background="@android:color/transparent"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_vertical"
+                android:onClick="onFavoriteItemClick"
+
+                />
         </LinearLayout>
-
-
-
-        <ImageButton
-            android:id="@+id/favButton"
-            android:src="@drawable/right_arrow"
-            android:background="@android:color/transparent"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_gravity="center_vertical"
-            android:onClick="onFavoriteItemClick"
-
-            />
 
 
     </LinearLayout>

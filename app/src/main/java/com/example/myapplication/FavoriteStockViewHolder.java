@@ -34,8 +34,8 @@ public class FavoriteStockViewHolder extends RecyclerView.ViewHolder{
     public void bind(FavoriteStock favoriteStock, Context context) {
         stockNameTextView.setText(favoriteStock.getTickerSymbol());
         companyNameTextView.setText(favoriteStock.getCompanyName());
-        currentPriceTextView.setText(String.valueOf(favoriteStock.getCurrentPrice()));
-        changeTextView.setText(String.valueOf(favoriteStock.getChange()) + "(" + String.valueOf(favoriteStock.getChangePercent()) + "%)");
+        currentPriceTextView.setText("$" + String.format("%.2f",favoriteStock.getCurrentPrice()));
+        changeTextView.setText("$" + String.format("%.2f",favoriteStock.getChange()) + "(" + String.format("%.2f",favoriteStock.getChangePercent()) + "%)");
 
         favStockButton.setOnClickListener(new View.OnClickListener() {
             @Override
