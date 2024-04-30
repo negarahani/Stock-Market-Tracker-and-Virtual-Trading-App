@@ -3,11 +3,14 @@ package com.example.myapplication;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.ItemTouchHelper;
@@ -34,6 +37,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,16 +91,72 @@ public class MainActivity extends AppCompatActivity{
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(sectionAdapter);
 
+        //set the finhub footer
+        TextView finhubFooterText = findViewById(R.id.finhubFooter);
+        finhubFooterText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String url = "https://finnhub.io/";
+
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+
+                startActivity(intent);
+            }
+        });
+
 
     }
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onResume() {
         super.onResume();
-        getAPIBalance();
         getFavoriteStocks();
-        getPortfolioStocks();
+        getAPIBalanceAndPortfolioStocks();
+        getCurrentTime();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void getCurrentTime(){
+
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy");
+        String formattedTime = now.format(formatter);
+
+        TextView curDateText = findViewById(R.id.dateText);
+        curDateText.setText(formattedTime);
+    }
+    private void getAPIBalanceAndPortfolioStocks() {
+        getAPIBalance(new BalanceCallback() {
+            @Override
+            public void onBalanceReceived(double cashBalance) {
+                getPortfolioStocks(new PortfolioStocksCallback() {
+                    @Override
+                    public void onPortfolioStocksReceived(List<PortfolioStock> portfolioStocks) {
+                        updateNetWorth(cashBalance, portfolioStocks);
+                    }
+                });
+            }
+        });
+    }
+
+    private void updateNetWorth(double cashBalance, List<PortfolioStock> portfolioStocks) {
+
+        double netWorth = 0;
+        double sumOfAllMarketValues = 0;
+
+        for(PortfolioStock portfolioItem : portfolioStocks){
+            sumOfAllMarketValues += portfolioItem.getMarketValue();
+        }
+        netWorth = cashBalance + sumOfAllMarketValues;
+        String netWorthFormatted = String.format("%.2f", netWorth);
+
+        TextView netWorthText = findViewById(R.id.networthText);
+        netWorthText.setText(String.format("$" + netWorthFormatted));
+
     }
 
     @Override
@@ -195,7 +256,7 @@ public class MainActivity extends AppCompatActivity{
         queue.add(stringRequest);
     }
 
-    private void getAPIBalance() {
+    private void getAPIBalance(BalanceCallback callback) {
         String balanceUrl = BASE_URL + "/api/wallet/getBalance";
         final TextView balanceText = findViewById(R.id.balanceText);
         RequestQueue queue = Volley.newRequestQueue(this);
@@ -210,6 +271,10 @@ public class MainActivity extends AppCompatActivity{
                             double cashBalance = jsonObject.getDouble("cash_balance");
                             String formattedBalance = "$" + String.format("%.2f", cashBalance);
                             balanceText.setText(formattedBalance);
+
+                            callback.onBalanceReceived(cashBalance);
+
+
                         } catch (JSONException e) {
                             String errorMessage = "Error parsing JSON: " + e.getMessage();
                             Log.e("MainActivity", errorMessage);
@@ -227,7 +292,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     /********************* Getting Portfolio Data Section ****************************/
-    private void getPortfolioStocks(){
+    private void getPortfolioStocks(PortfolioStocksCallback callback){
         String portfolioUrl = BASE_URL + "/api/portfolio/getPortfolio";
         RequestQueue queue = Volley.newRequestQueue(this);
 
@@ -249,6 +314,8 @@ public class MainActivity extends AppCompatActivity{
                                     Log.d("PortfolioStocks", "Portfolio Stock: " + stock.toString());
                                 }
 
+                                callback.onPortfolioStocksReceived(portfolioStocks);
+
                                 // //call the method to save the portfolio stocks array to shared preferences
                                 savePortfolioStocks(portfolioStocks);
 
@@ -257,7 +324,6 @@ public class MainActivity extends AppCompatActivity{
                                 sectionAdapter_portfolio.addSection(portfolioStockSection);
                                 // Notify adapter about the data change
                                 sectionAdapter_portfolio.notifyDataSetChanged();
-
 
 
 
@@ -541,6 +607,15 @@ public class MainActivity extends AppCompatActivity{
     public interface ParseFavoritesDataCallback {
         void onParseFavoritesDataCompleted(List<FavoriteStock> favoriteStocks);
     }
+
+    public interface BalanceCallback{
+        void onBalanceReceived(double balance);
+    }
+
+    private interface PortfolioStocksCallback {
+        void onPortfolioStocksReceived(List<PortfolioStock> portfolioStocks);
+    }
+
 
     public void onItemMoved(int fromPosition, int toPosition) {
         Log.d("FavoriteStocks", "onItemMoved triggered");

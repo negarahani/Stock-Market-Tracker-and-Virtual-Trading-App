@@ -3,4 +3,6 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="custom_progress_color">#7F00FF</color>
+    <color name="positive_color">#319C5E</color>
+    <color name="negative_color">#9B4049</color>
 </resources>
