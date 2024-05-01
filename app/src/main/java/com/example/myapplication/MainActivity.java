@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity{
     RecyclerView recyclerView_portfolio;
     List<PortfolioStock> portfolioStocks;
 
+    double netWorth;
+
     //related to Favorites
     private SectionedRecyclerViewAdapter sectionAdapter;
     RecyclerView recyclerView;
@@ -91,6 +93,7 @@ public class MainActivity extends AppCompatActivity{
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(sectionAdapter);
 
+
         //set the finhub footer
         TextView finhubFooterText = findViewById(R.id.finhubFooter);
         finhubFooterText.setOnClickListener(new View.OnClickListener() {
@@ -106,7 +109,6 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
-
     }
 
 
@@ -114,11 +116,35 @@ public class MainActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
+
+        //clear anything stored in shared preferences from before(because we catch fresh from API)
+        clearSharedPreferences();
+
+        //sectionAdapter = new SectionedRecyclerViewAdapter(); this will mess up the swipe-to-delete ??
+        recyclerView.setAdapter(sectionAdapter);
+
+        sectionAdapter_portfolio = new SectionedRecyclerViewAdapter();
+        recyclerView_portfolio.setAdapter(sectionAdapter_portfolio);
+
         getFavoriteStocks();
         getAPIBalanceAndPortfolioStocks();
         getCurrentTime();
     }
 
+    private void clearSharedPreferences() {
+        // Clear favorite stocks SharedPreferences
+        SharedPreferences favoritesSharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor favoritesEditor = favoritesSharedPreferences.edit();
+        favoritesEditor.clear();
+        favoritesEditor.apply();
+
+        // Clear portfolio stocks SharedPreferences
+        SharedPreferences portfolioSharedPreferences = getSharedPreferences(PREFS_NAME_PORTFOLIO, Context.MODE_PRIVATE);
+        SharedPreferences.Editor portfolioEditor = portfolioSharedPreferences.edit();
+        portfolioEditor.clear();
+        portfolioEditor.apply();
+
+    }
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void getCurrentTime(){
 
@@ -145,7 +171,7 @@ public class MainActivity extends AppCompatActivity{
 
     private void updateNetWorth(double cashBalance, List<PortfolioStock> portfolioStocks) {
 
-        double netWorth = 0;
+        netWorth = 0;
         double sumOfAllMarketValues = 0;
 
         for(PortfolioStock portfolioItem : portfolioStocks){
@@ -259,6 +285,7 @@ public class MainActivity extends AppCompatActivity{
     private void getAPIBalance(BalanceCallback callback) {
         String balanceUrl = BASE_URL + "/api/wallet/getBalance";
         final TextView balanceText = findViewById(R.id.balanceText);
+        final TextView netWorthText = findViewById(R.id.networthText);
         RequestQueue queue = Volley.newRequestQueue(this);
 
         StringRequest stringRequest = new StringRequest(Request.Method.GET, balanceUrl,
@@ -271,6 +298,10 @@ public class MainActivity extends AppCompatActivity{
                             double cashBalance = jsonObject.getDouble("cash_balance");
                             String formattedBalance = "$" + String.format("%.2f", cashBalance);
                             balanceText.setText(formattedBalance);
+
+                            netWorth = cashBalance;
+                            String formattedNetWorth = "$" + String.format("%.2f", netWorth);
+                            netWorthText.setText(formattedNetWorth);
 
                             callback.onBalanceReceived(cashBalance);
 
@@ -324,6 +355,7 @@ public class MainActivity extends AppCompatActivity{
                                 sectionAdapter_portfolio.addSection(portfolioStockSection);
                                 // Notify adapter about the data change
                                 sectionAdapter_portfolio.notifyDataSetChanged();
+
 
 
 
@@ -463,6 +495,8 @@ public class MainActivity extends AppCompatActivity{
     private void getFavoriteStocks() {
         String favoritesUrl = BASE_URL + "/api/favorites/getFavorites";
         RequestQueue queue = Volley.newRequestQueue(this);
+
+
 
         favoriteStocks = new ArrayList<>(); // Clear the previous results
         // Clear the adapter before fetching new data

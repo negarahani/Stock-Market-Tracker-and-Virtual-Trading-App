@@ -635,10 +635,15 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
 
         String json = sharedPreferences.getString(KEY_PORTFOLIO_STOCKS, null);
 
-        // converting JSON to list of favorite stocks
-        Gson gson = new Gson();
-        Type type = new TypeToken<List<PortfolioStock>>() {}.getType();
-        return gson.fromJson(json, type);
+        if (json == null || json.isEmpty()) {
+            // Return an empty list
+            return new ArrayList<>();
+        } else {
+            // converting JSON to list of favorite stocks
+            Gson gson = new Gson();
+            Type type = new TypeToken<List<PortfolioStock>>() {}.getType();
+            return gson.fromJson(json, type);
+        }
     }
 
     /************************ end of portfolio related methods *****************************/
@@ -1099,10 +1104,16 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
 
         String json = sharedPreferences.getString(KEY_FAVORITE_STOCKS, null);
 
-        // converting JSON to list of favorite stocks
-        Gson gson = new Gson();
-        Type type = new TypeToken<List<FavoriteStock>>() {}.getType();
-        return gson.fromJson(json, type);
+        if (json == null || json.isEmpty()) {
+            // Return an empty list
+            return new ArrayList<>();
+        } else {
+            // converting JSON to list of favorite stocks
+            Gson gson = new Gson();
+            Type type = new TypeToken<List<FavoriteStock>>() {}.getType();
+            return gson.fromJson(json, type);
+        }
+
     }
     private void addFavoriteStock(String ticker) {
         String addFavoritesUrl = BASE_URL + "/api/favorites/addFavorites/";

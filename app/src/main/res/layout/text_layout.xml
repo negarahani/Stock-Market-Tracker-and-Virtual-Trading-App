@@ -79,7 +79,6 @@
                     android:layout_marginTop="10dp">
 
                     <ImageView
-                        android:id="@+id/portfolio_change_image"
                         android:layout_width="wrap_content"
                         android:layout_height="match_parent"
                         android:layout_weight="1"

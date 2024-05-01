@@ -78,8 +78,10 @@ public class FavoritesSwipeToDeleteCallback extends ItemTouchHelper.Callback {
         int position = viewHolder.getAdapterPosition();
         Log.d("FavoriteStocks", "onSwiped: position swiped is:" + position );
         //Log.d("FavoriteStocks", "adapter length:" + mAdapter.getSectionCount()); always giving 1 ??
+
         String tickerSymbol = ((FavoriteStockSection) mAdapter.getSection(0)).getTickerAtPosition(position);
         Log.d("FavoriteStocks", "tickerSymbol:" + tickerSymbol);
+
 
         // Update section data --> added this line because the item would stay in the UI despite being deleted from the database
         //(the bug happened when I returned to the screen from outside
@@ -88,7 +90,6 @@ public class FavoritesSwipeToDeleteCallback extends ItemTouchHelper.Callback {
 
         // Perform swipe-to-delete action
         mAdapter.notifyItemRemoved(position);
-
 
         //call function to delete the favorite stock item
         deleteFavoriteStock(tickerSymbol);
@@ -104,7 +105,7 @@ public class FavoritesSwipeToDeleteCallback extends ItemTouchHelper.Callback {
                     public void onResponse(String response) {
                         // Handle successful response
                         Log.d("FavoriteStock", "Favorite stock removed successfully: " + ticker);
-                        //no need for updating mFavorites because mFavoriteStocks is a reference to an array that is already updated in MainActivity!
+                        //no need for updating mFavorites because mFavoriteStocks is a reference to an array that is already updated in MainActivity!??
                         Log.d("FavoriteStock", "Favorite Stocks array after delete:" + mFavoriteStocks);
 
                         updateSharedPreferences();
@@ -125,6 +126,11 @@ public class FavoritesSwipeToDeleteCallback extends ItemTouchHelper.Callback {
 
 
     private void updateSharedPreferences() {
+
+        Log.d("FavoriteStocks", "mFavoriteStocks inside sharedPreferences is: ");
+        for (FavoriteStock item: mFavoriteStocks){
+            Log.d("FavoriteStocks","FavoriteStockItem: " +  item.toString());
+        }
 
         Gson gson = new Gson();
         String json = gson.toJson(mFavoriteStocks);

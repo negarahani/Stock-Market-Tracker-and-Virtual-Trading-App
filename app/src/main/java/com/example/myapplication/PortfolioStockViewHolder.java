@@ -6,7 +6,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 
@@ -18,6 +21,7 @@ public class PortfolioStockViewHolder extends RecyclerView.ViewHolder{
     private TextView changeTextView;
 
     private ImageButton portfolioStockButton;
+    private ImageView changeImageView;
 
     public PortfolioStockViewHolder(View itemView) {
         super(itemView);
@@ -27,6 +31,8 @@ public class PortfolioStockViewHolder extends RecyclerView.ViewHolder{
         changeTextView = itemView.findViewById(R.id.changeText_portfolio);
 
         portfolioStockButton = itemView.findViewById(R.id.portfolioButton);
+
+       changeImageView = itemView.findViewById(R.id.portfolio_change_image);
 
     }
 
@@ -45,6 +51,21 @@ public class PortfolioStockViewHolder extends RecyclerView.ViewHolder{
 
         marketValueTextView.setText("$" + marketValueFormatted);
         changeTextView.setText("$" + changeFormatted + "( " + changePercentFormatted + "% )");
+
+        //set the color fo changeTextView and the corresponding images
+
+        if (portfolioStock.getChange() > 0 ){
+            changeTextView.setTextColor(ContextCompat.getColor(context, R.color.positive_color));
+            changeImageView.setImageResource(R.drawable.trending_up);
+            changeImageView.setVisibility(View.VISIBLE);
+        } else if (portfolioStock.getChange() < 0) {
+            changeTextView.setTextColor(ContextCompat.getColor(context, R.color.negative_color));
+            changeImageView.setImageResource(R.drawable.trending_down);
+            changeImageView.setVisibility(View.VISIBLE);
+        }  else {
+            //If change is zero, don't show any image
+            changeImageView.setVisibility(View.GONE);
+        }
 
         portfolioStockButton.setOnClickListener(new View.OnClickListener() {
             @Override

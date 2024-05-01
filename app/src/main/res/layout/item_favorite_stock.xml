@@ -75,12 +75,13 @@
                 <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:orientation="horizontal"
+                    android:layout_marginTop="10dp">
 
                     <ImageView
                         android:id="@+id/favorites_change_image"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
+                        android:layout_height="match_parent"
                         android:layout_weight="1"
                         app:srcCompat="@drawable/trending_up" />
 
@@ -88,7 +89,6 @@
                         android:id="@+id/changeText_fav"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
                         android:layout_marginLeft="8dp"
                         android:text="change"
                         android:textAlignment="viewEnd"
