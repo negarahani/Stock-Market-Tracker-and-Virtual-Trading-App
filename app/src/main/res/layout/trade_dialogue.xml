@@ -57,11 +57,12 @@
         android:layout_height="35dp"
         android:layout_marginStart="50dp"
         android:layout_marginTop="220dp"
-        android:background="#4CAF50"
         android:text="BUY"
         android:textColor="@color/white"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/button_shape"
+        />
 
     <TextView
         android:id="@+id/tradeBalanceText"
@@ -82,11 +83,11 @@
         android:layout_height="35dp"
         android:layout_marginTop="220dp"
         android:layout_marginEnd="50dp"
-        android:background="#4CAF50"
         android:text="SELL"
         android:textColor="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:background="@drawable/button_shape"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -19,13 +19,13 @@
             <TextView
                 android:id="@+id/stats_open_rpice"
                 android:layout_width="163dp"
-                android:layout_height="wrap_content"
+                android:layout_height="25dp"
                 android:text="TextView" />
 
             <TextView
                 android:id="@+id/stats_high_rpice"
                 android:layout_width="163dp"
-                android:layout_height="wrap_content"
+                android:layout_height="25dp"
                 android:text="TextView" />
 
 
@@ -38,13 +38,13 @@
             <TextView
                 android:id="@+id/stats_low_price"
                 android:layout_width="163dp"
-                android:layout_height="wrap_content"
+                android:layout_height="25dp"
                 android:text="TextView" />
 
             <TextView
                 android:id="@+id/stats_prev_close"
                 android:layout_width="163dp"
-                android:layout_height="wrap_content"
+                android:layout_height="25dp"
                 android:text="TextView" />
 
         </TableRow>

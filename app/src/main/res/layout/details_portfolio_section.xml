@@ -9,25 +9,25 @@
         <TableLayout
             android:id="@+id/tableLayout2"
             android:layout_width="278dp"
-            android:layout_height="97dp"
+            android:layout_height="wrap_content"
             android:layout_marginLeft="15dp"
             android:background="@color/white"
            >
 
             <TableRow
                 android:layout_width="match_parent"
-                android:layout_height="match_parent">
+                android:layout_height="wrap_content">
 
                 <TextView
                     android:id="@+id/sharesOwnedTitle"
                     android:layout_width="163dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="25dp"
                     android:text="Shares Owned: " />
 
                 <TextView
                     android:id="@+id/sharesOwnedText"
                     android:layout_width="114dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="25dp"
                     android:text="TextView" />
             </TableRow>
 
@@ -38,13 +38,13 @@
                 <TextView
                     android:id="@+id/avgCostShareTitle"
                     android:layout_width="163dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="25dp"
                     android:text="Avg. Cost / Share: " />
 
                 <TextView
                     android:id="@+id/avgCostShareText"
                     android:layout_width="114dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="25dp"
                     android:text="TextView" />
             </TableRow>
 
@@ -55,13 +55,13 @@
                 <TextView
                     android:id="@+id/totalCostTitle"
                     android:layout_width="163dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="25dp"
                     android:text="Total Cost: " />
 
                 <TextView
                     android:id="@+id/totalCostText"
                     android:layout_width="114dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="25dp"
                     android:text="TextView" />
             </TableRow>
 
@@ -72,13 +72,13 @@
                 <TextView
                     android:id="@+id/changeTitleTrade"
                     android:layout_width="163dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="25dp"
                     android:text="Change: " />
 
                 <TextView
                     android:id="@+id/changeTextTrade"
                     android:layout_width="114dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="25dp"
                     android:text="TextView" />
             </TableRow>
 
@@ -89,13 +89,13 @@
                 <TextView
                     android:id="@+id/marketValueTitle"
                     android:layout_width="163dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="25dp"
                     android:text="Market Value: " />
 
                 <TextView
                     android:id="@+id/marketValueText"
                     android:layout_width="114dp"
-                    android:layout_height="wrap_content"
+                    android:layout_height="25dp"
                     android:text="TextView" />
             </TableRow>
 
@@ -103,14 +103,13 @@
 
         <Button
             android:id="@+id/tradeButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="100dp"
+            android:layout_height="40dp"
             android:layout_marginTop="20dp"
-            android:layout_marginLeft="20dp"
-            android:backgroundTint="#4CAF50"
+            android:layout_marginRight="10dp"
             android:text="TRADE"
             android:textColor="#FFFFFF"
-
+            android:background="@drawable/button_shape"
             />
 
     </LinearLayout>

@@ -20,13 +20,13 @@
             <TextView
                 android:id="@+id/about_ipo_title"
                 android:layout_width="130dp"
-                android:layout_height="wrap_content"
+                android:layout_height="25dp"
                 android:text="IPO Start Date" />
 
             <TextView
                 android:id="@+id/about_ipo_text"
                 android:layout_width="230dp"
-                android:layout_height="wrap_content"
+                android:layout_height="25dp"
                 android:text="TextView" />
 
 
@@ -39,13 +39,13 @@
             <TextView
                 android:id="@+id/about_industry_title"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="25dp"
                 android:text="Industry" />
 
             <TextView
                 android:id="@+id/about_industry_text"
                 android:layout_width="230dp"
-                android:layout_height="wrap_content"
+                android:layout_height="25dp"
                 android:text="TextView" />
 
         </TableRow>
@@ -57,13 +57,13 @@
             <TextView
                 android:id="@+id/about_webpage_title"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="25dp"
                 android:text="Webpage" />
 
             <TextView
                 android:id="@+id/about_webpage_text"
                 android:layout_width="230dp"
-                android:layout_height="wrap_content"
+                android:layout_height="25dp"
                 android:autoLink="web"
                 android:text="TextView" />
 
@@ -74,7 +74,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="25dp"
         android:orientation="horizontal"
         android:layout_marginLeft="15dp">
 
