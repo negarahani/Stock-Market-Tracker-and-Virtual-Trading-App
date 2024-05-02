@@ -92,7 +92,7 @@
             android:layout_width="300dp"
             android:layout_height="wrap_content"
             android:scrollHorizontally="true"
-            android:text="Just a long text" />
+            android:text=" " />
 
     </HorizontalScrollView>
 

@@ -28,7 +28,7 @@
 
 
 
-  function createHourlyChart(resultsData) {
+  function createHourlyChart(resultsData, curTicker, chartColor) {
 
       console.log("createHourlyChart was called");
       console.log("Received data:", resultsData);
@@ -50,7 +50,7 @@
 
       Highcharts.stockChart('chartContainer',{
       title: {
-        text: `AAPL Hourly Price Variation` 
+        text: curTicker + ' Hourly Price Variation'
       },
       rangeSelector: {
         enabled: false 
@@ -59,13 +59,13 @@
         enabled: false 
       },
       chart: {
-        backgroundColor: '#F5F5F5'
+        backgroundColor: '#FFFFFF'
       },
       series: [{
         type: 'line',
-        //name: `${this.searchService.searchedTicker}`,
+        name: curTicker,
         data: priceArray,
-        //color: lineColor
+        color: chartColor
       }]
     });
   

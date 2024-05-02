@@ -67,7 +67,7 @@ private static final String BASE_URL = "https://mywebtech4-729326.lm.r.appspot.c
                         try {
                             JSONArray resultsArray = response.getJSONArray("results");
                             historicalDataArray = resultsArray; //I did not really need this extra variable
-                            createHistoricalChart(historicalDataArray);
+                            createHistoricalChart(historicalDataArray, tickerSymbol);
 
                         } catch (JSONException e) {
                             String errorMessage = "Error parsing JSON: " + e.getMessage();
@@ -85,7 +85,7 @@ private static final String BASE_URL = "https://mywebtech4-729326.lm.r.appspot.c
 
     }
 
-    private void createHistoricalChart(JSONArray dataArray){
+    private void createHistoricalChart(JSONArray dataArray, String curTicker){
         Log.d("DetailsActivity","Data for creating historical chart is " + dataArray);
 
         // Enable JavaScript execution in the WebView
@@ -102,7 +102,7 @@ private static final String BASE_URL = "https://mywebtech4-729326.lm.r.appspot.c
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 // Calling JavaScript function to pass data
-                webView.loadUrl("javascript:createHistoricalChart(" + dataArray + ")");
+                webView.loadUrl("javascript:createHistoricalChart(" + dataArray + ", '" + curTicker + "')");
             }
         });
     }

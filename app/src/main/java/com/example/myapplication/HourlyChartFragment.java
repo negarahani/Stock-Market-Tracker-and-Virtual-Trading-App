@@ -38,6 +38,7 @@ private static final String BASE_URL = "https://mywebtech4-729326.lm.r.appspot.c
 
     private String curTicker;
     private WebView webView;
+    private String chartColor = "#000000";
 
     public static HourlyChartFragment newInstance(String ticker) {
         HourlyChartFragment fragment = new HourlyChartFragment();
@@ -64,6 +65,8 @@ private static final String BASE_URL = "https://mywebtech4-729326.lm.r.appspot.c
 
         return view;
     }
+
+
     private void getHourlyChartDates(String tickerSymbol) {
         String quoteUrl = BASE_URL + "/search-quote/" + tickerSymbol;
 
@@ -84,6 +87,7 @@ private static final String BASE_URL = "https://mywebtech4-729326.lm.r.appspot.c
                             // Calculate current time
                             long currentTime = System.currentTimeMillis();
 
+
                             if ((currentTime - lastOpenTime) > 5 * 60 * 1000) { // Market is closed
                                 Date toDate = new Date(lastOpenTime);
                                 toDateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(toDate);
@@ -103,6 +107,14 @@ private static final String BASE_URL = "https://mywebtech4-729326.lm.r.appspot.c
                                 fromDateCalendar.add(Calendar.DATE, -1);
                                 Date fromDate = fromDateCalendar.getTime();
                                 fromDateFormatted = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(fromDate);
+                            }
+
+                            //get the change value to determine color
+                            double changeVal = jsonObject.getDouble("d");
+                            if (changeVal > 0){
+                                chartColor = "#319C5E";
+                            } else if (changeVal < 0){
+                                chartColor = "#9B4049";
                             }
 
                             Log.d("DetailsActivity", "fromDateFormatted is: " + fromDateFormatted);
@@ -139,7 +151,7 @@ private static final String BASE_URL = "https://mywebtech4-729326.lm.r.appspot.c
                     public void onResponse(JSONObject response) {
                         try {
                             JSONArray resultsArray = response.getJSONArray("results");
-                            createHourlyChart(resultsArray);
+                            createHourlyChart(resultsArray, tickerSymbol, chartColor);
 
                         } catch (JSONException e) {
                             String errorMessage = "Error parsing JSON: " + e.getMessage();
@@ -157,7 +169,7 @@ private static final String BASE_URL = "https://mywebtech4-729326.lm.r.appspot.c
         queue.add(jsonObjectRequest);
     }
 
-    private void createHourlyChart(JSONArray dataArray){
+    private void createHourlyChart(JSONArray dataArray, String curTicker, String chartColor){
         Log.d("DetailsActivity","Data for creating hourly chart is " + dataArray);
 
         // Enable JavaScript execution in the WebView
@@ -174,7 +186,7 @@ private static final String BASE_URL = "https://mywebtech4-729326.lm.r.appspot.c
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
                 // Calling JavaScript function to pass data
-                webView.loadUrl("javascript:createHourlyChart(" + dataArray + ")");
+                webView.loadUrl("javascript:createHourlyChart(" + dataArray + ", '" + curTicker + "', '" + chartColor + "')");
             }
         });
     }

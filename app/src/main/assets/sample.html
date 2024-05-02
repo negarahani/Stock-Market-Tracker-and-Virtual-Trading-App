@@ -28,7 +28,7 @@
 
 
 
-  function createHistoricalChart(resultsData) {
+  function createHistoricalChart(resultsData, curTicker) {
 
       console.log("createHistoricalChart was called");
       console.log("Received data:", resultsData);
@@ -59,13 +59,13 @@
       Highcharts.stockChart('chartContainer', {
 
           chart:{
-      backgroundColor: '#F5F5F5'
+      backgroundColor: '#FFFFFF'
     },
     rangeSelector: {
       selected: 2
     },
     title: {
-      text: 'AAPL Historical'
+      text: curTicker + ' Historical'
     },
 
     subtitle: {
@@ -117,8 +117,8 @@
   },
   series: [{
     type: 'candlestick',
-    name: 'AAPL',
-    id: 'AAPL',
+    name: curTicker,
+    id: curTicker,
     zIndex: 2,
     data: ohlc
 }, {
@@ -129,7 +129,7 @@
     yAxis: 1
   }, {
     type: 'vbp',
-    linkedTo: 'AAPL',
+    linkedTo: curTicker,
     params: {
         volumeSeriesID: 'volume'
     },
@@ -141,7 +141,7 @@
     }
     }, {
     type: 'sma',
-    linkedTo: 'AAPL',
+    linkedTo: curTicker,
     zIndex: 1,
     marker: {
         enabled: false

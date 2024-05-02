@@ -36,6 +36,7 @@ import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.NavUtils;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -621,10 +622,10 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
         TextView marketValueText = findViewById(R.id.marketValueText);
 
         sharesOwnedText.setText(String.valueOf(curQuantity));
-        avgCostShareText.setText(String.format("%.2f",curAvgCostShare));
-        totalCostText.setText(String.format("%.2f",curTotalCost));
-        changeTextDetails.setText(String.format("%.2f", curChange_Trade));
-        marketValueText.setText(String.format("%.2f", curMarketValue));
+        avgCostShareText.setText("$"+String.format("%.2f",curAvgCostShare));
+        totalCostText.setText("$"+String.format("%.2f",curTotalCost));
+        changeTextDetails.setText("$"+String.format("%.2f", curChange_Trade));
+        marketValueText.setText("$"+String.format("%.2f", curMarketValue));
 
     }
 
@@ -948,13 +949,29 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
 //                            curPrice = currentPrice; //set the class attribute to the obtained current price
 
                             // Convert double values to strings
-                            String curPriceStr = String.valueOf(currentPrice);
-                            String changeValStr = String.valueOf(changeVal);
-                            String changePercentStr = String.valueOf(changePercent);
+                            String curPriceStr = String.format("%.2f",currentPrice);
+                            String changeValStr = String.format("%.2f",changeVal);
+                            String changePercentStr = String.format("%.2f",changePercent);
 
 
                             currentPriceText.setText("$" + curPriceStr);
                             changeText.setText("$" + changeValStr + " (" + changePercentStr + "%)");
+
+                            ImageView companyChangeImage = findViewById(R.id.company_change_image);
+                            //set color and trending image
+                            if(changeVal > 0 ){
+                                changeText.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.positive_color));
+                                companyChangeImage.setImageResource(R.drawable.trending_up);
+                                companyChangeImage.setVisibility(View.VISIBLE);
+                            } else if (changeVal < 0){
+                                changeText.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.negative_color));
+                                companyChangeImage.setImageResource(R.drawable.trending_down);
+                                companyChangeImage.setVisibility(View.VISIBLE);
+                            } else {
+                                companyChangeImage.setVisibility(View.GONE);
+                            }
+
+
 
                             //related to stats section
                             double openPrice = jsonObject.getDouble("o");
@@ -962,13 +979,13 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
                             double lowPrice = jsonObject.getDouble("l");
                             double prevClose = jsonObject.getDouble("pc");
 
-                            String openPriceStr = String.valueOf(openPrice);
-                            String highPriceStr = String.valueOf(highPrice);
-                            String lowPriceStr  = String.valueOf(lowPrice);
-                            String prevCloseStr = String.valueOf(prevClose);
+                            String openPriceStr = String.format("%.2f",openPrice);
+                            String highPriceStr = String.format("%.2f",highPrice);
+                            String lowPriceStr  = String.format("%.2f",lowPrice);
+                            String prevCloseStr = String.format("%.2f",prevClose);
 
                             openPriceText.setText("Open Price : $" + openPriceStr);
-                            highPriceText.setText("High Price : $" + openPriceStr);
+                            highPriceText.setText("High Price : $" + highPriceStr);
                             lowPriceText.setText("Low Price : $" + lowPriceStr);
                             prevCloseText.setText("Prev. Close : $" + prevCloseStr);
 
@@ -1134,6 +1151,9 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
 
                         Log.d("DetailsActivity", "Favorite stock added successfully: " + ticker);
 
+                        String message = curTicker + " is added to favorites";
+                        Toast.makeText(DetailsActivity.this, message, Toast.LENGTH_SHORT).show();
+
                         // Updateing the local list
                         myFavoriteStocks.add(new FavoriteStock(ticker, curCompanyName));
 
@@ -1162,8 +1182,12 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
                     public void onResponse(String response) {
                         // Handle successful response
                         Log.d("DetailsActivity", "Favorite stock removed successfully: " + ticker);
-                        // Remove the favorite stock from the local list
 
+                        String message = curTicker + " is removed from favorites";
+                        Toast.makeText(DetailsActivity.this, message, Toast.LENGTH_SHORT).show();
+
+
+                        // Remove the favorite stock from the local list
                         if (myFavoriteStocks != null) {
                             for (FavoriteStock stock : myFavoriteStocks) {
                                 if (stock.getTickerSymbol().equals(ticker)) {
