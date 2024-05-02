@@ -264,6 +264,10 @@ public class MainActivity extends AppCompatActivity{
                                     String[] parts = selectedItem.split(" \\| ");
                                     if (parts.length >= 2) {
                                         String symbol = parts[0];
+
+                                        // Populate the search bar with the selected ticker
+                                        autoCompleteTextView.setText(symbol);
+
                                         launchDetailsActivity(symbol);
                                     }
                                 }

@@ -535,10 +535,21 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
         TextView marketValueText = findViewById(R.id.marketValueText);
 
         sharesOwnedText.setText(String.valueOf(curQuantity));
-        avgCostShareText.setText(String.format("%.2f",curAvgCostShare));
-        totalCostText.setText(String.format("%.2f",curTotalCost));
-        changeTextDetails.setText(String.format("%.2f", curChange_Trade));
-        marketValueText.setText(String.format("%.2f", curMarketValue));
+        avgCostShareText.setText("$"+String.format("%.2f",curAvgCostShare));
+        totalCostText.setText("$"+String.format("%.2f",curTotalCost));
+        changeTextDetails.setText("$"+String.format("%.2f", curChange_Trade));
+        marketValueText.setText("$"+String.format("%.2f", curMarketValue));
+
+        if (curChange_Trade > 0) {
+            changeTextDetails.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.positive_color));
+            marketValueText.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.positive_color));
+        } else if(curChange_Trade < 0) {
+            changeTextDetails.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.negative_color));
+            marketValueText.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.negative_color));
+        } else {
+            changeTextDetails.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.black));
+            marketValueText.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.black));
+        }
 
         //launch the success dialogue after selling is successfully done
         launchBuySuccessDialogue();
@@ -587,10 +598,21 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
         TextView marketValueText = findViewById(R.id.marketValueText);
 
         sharesOwnedText.setText(String.valueOf(curQuantity));
-        avgCostShareText.setText(String.format("%.2f",curAvgCostShare));
-        totalCostText.setText(String.format("%.2f",curTotalCost));
-        changeTextDetails.setText(String.format("%.2f", curChange_Trade));
-        marketValueText.setText(String.format("%.2f", curMarketValue));
+        avgCostShareText.setText("$"+String.format("%.2f",curAvgCostShare));
+        totalCostText.setText("$"+String.format("%.2f",curTotalCost));
+        changeTextDetails.setText("$"+String.format("%.2f", curChange_Trade));
+        marketValueText.setText("$"+String.format("%.2f", curMarketValue));
+
+        if (curChange_Trade > 0) {
+            changeTextDetails.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.positive_color));
+            marketValueText.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.positive_color));
+        } else if(curChange_Trade < 0) {
+            changeTextDetails.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.negative_color));
+            marketValueText.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.negative_color));
+        } else {
+            changeTextDetails.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.black));
+            marketValueText.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.black));
+        }
 
         //launch the success dialogue after selling is successfully done
         launchSellSuccessDialogue();
@@ -626,6 +648,17 @@ public class DetailsActivity extends AppCompatActivity implements NewsRecyclerVi
         totalCostText.setText("$"+String.format("%.2f",curTotalCost));
         changeTextDetails.setText("$"+String.format("%.2f", curChange_Trade));
         marketValueText.setText("$"+String.format("%.2f", curMarketValue));
+
+        if (curChange_Trade > 0) {
+            changeTextDetails.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.positive_color));
+            marketValueText.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.positive_color));
+        } else if(curChange_Trade < 0) {
+            changeTextDetails.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.negative_color));
+            marketValueText.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.negative_color));
+        } else {
+            changeTextDetails.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.black));
+            marketValueText.setTextColor(ContextCompat.getColor(DetailsActivity.this, R.color.black));
+        }
 
     }
 
