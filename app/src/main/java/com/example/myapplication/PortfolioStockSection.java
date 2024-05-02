@@ -23,6 +23,8 @@ public class PortfolioStockSection extends Section {
         this.sectionPosition = sectionPosition;
     }
 
+
+
     @Override
     public int getContentItemsTotal() {
         return portfolioStocks.size();
@@ -59,4 +61,5 @@ public class PortfolioStockSection extends Section {
     public List<PortfolioStock> getData() {
         return portfolioStocks;
     }
+
 }

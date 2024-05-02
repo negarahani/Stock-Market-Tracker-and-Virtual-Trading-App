@@ -19,6 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -356,7 +357,10 @@ public class MainActivity extends AppCompatActivity{
                                 // Notify adapter about the data change
                                 sectionAdapter_portfolio.notifyDataSetChanged();
 
-
+                                //drag and reorder functionality
+                                ItemTouchHelper.Callback callback_portfolio = new PortfolioItemTouchHelper(MainActivity.this, sectionAdapter_portfolio);
+                                ItemTouchHelper itemTouchHelper_portfolio = new ItemTouchHelper(callback_portfolio);
+                                itemTouchHelper_portfolio.attachToRecyclerView(recyclerView_portfolio);
 
 
                             }
@@ -683,4 +687,7 @@ public class MainActivity extends AppCompatActivity{
         editor.apply();
     }
     /********************* End of Getting Favorites Data Section ****************************/
+
+
+
 }
