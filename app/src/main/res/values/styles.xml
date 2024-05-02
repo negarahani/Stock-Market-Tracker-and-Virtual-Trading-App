@@ -19,4 +19,8 @@
         <item name="android:background">@color/white</item>
     </style>
 
+    <style name="TextAppearanceTheme" parent="Theme.AppCompat.Light">
+        <item name="android:textColor">@android:color/black</item>
+    </style>
+
 </resources>

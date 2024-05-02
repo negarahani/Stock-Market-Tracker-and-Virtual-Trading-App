@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="300dp"
     android:background="@drawable/dialogue_shape"
+    android:theme="@style/TextAppearanceTheme"
     >
 
     <TextView
@@ -22,6 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="39dp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -67,6 +69,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="180dp"
         android:text="TextView"
+        android:textColor="#707070"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.509"
         app:layout_constraintStart_toStartOf="parent"

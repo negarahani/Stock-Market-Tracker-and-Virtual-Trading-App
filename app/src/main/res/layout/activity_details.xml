@@ -44,7 +44,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_gravity="center"
-                android:layout_marginTop="270dp"
+                android:layout_marginTop="400dp"
                 android:layout_marginBottom="600dp"
                 android:indeterminateTint="@color/custom_progress_color"
                 app:layout_constraintTop_toTopOf="@id/details_toolbar" />
@@ -54,7 +54,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:orientation="vertical"
-                android:layout_marginTop="85dp"
+                android:layout_marginTop="75dp"
                 android:visibility="gone"
                 >
 
@@ -143,7 +143,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="373dp"
                     android:layout_weight="1"
-                    android:layout_marginTop="20dp"
+                    android:layout_marginTop="30dp"
                     app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
                 <com.google.android.material.tabs.TabLayout

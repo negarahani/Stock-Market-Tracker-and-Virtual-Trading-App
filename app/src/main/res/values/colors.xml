@@ -5,4 +5,5 @@
     <color name="custom_progress_color">#7F00FF</color>
     <color name="positive_color">#319C5E</color>
     <color name="negative_color">#9B4049</color>
+    <color name="myGray">#D3D3D3</color>
 </resources>
