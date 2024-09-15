@@ -41,3 +41,7 @@ This Android application allows users to search for stock symbols/tickers, view 
 - **Picasso & Glide:** Libraries used for efficient image loading and display, handling various image-related tasks.
 - **Volley:** Employed for network operations, including making API calls and handling responses.
 - **Node.js & Express:** Backend technologies used to create and manage API endpoints and handle server-side logic.
+  
+## Demo Video
+
+[Watch the demo video](https://www.youtube.com/watch?v=154yEzqdS1I)
