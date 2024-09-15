@@ -26,6 +26,7 @@ This Android application allows users to search for stock symbols/tickers, view 
 ## Technical Details
 
 - The app utilizes 9 API calls to Finnhub for data such as company profiles, stock quotes, news, recommendations, and chart data.
+- Backend services are implemented using **Node.js** and **Express**, providing robust API endpoints for data handling.
 - Implemented using RecyclerView and ConstraintLayout for a clean and responsive UI.
 - Search and detail views are designed to enhance user experience with seamless navigation and real-time data display.
 
@@ -39,3 +40,4 @@ This Android application allows users to search for stock symbols/tickers, view 
 - **Android SDK:** Provides the necessary tools and libraries for Android app development.
 - **Picasso & Glide:** Libraries used for efficient image loading and display, handling various image-related tasks.
 - **Volley:** Employed for network operations, including making API calls and handling responses.
+- **Node.js & Express:** Backend technologies used to create and manage API endpoints and handle server-side logic.
