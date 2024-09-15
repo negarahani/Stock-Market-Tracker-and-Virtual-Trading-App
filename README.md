@@ -2,6 +2,10 @@
 
 This Android application allows users to search for stock symbols/tickers, view detailed stock information, trade with virtual money, and manage a portfolio. Users can also track their favorite stock symbols. The app has two main screens: the Home screen and the Detailed Stock Information screen, each with multiple features.
 
+## Demo Video
+
+[Watch the demo video](https://www.youtube.com/watch?v=154yEzqdS1I)
+
 ## Key Features
 
 1. **Home Screen:**
@@ -41,7 +45,4 @@ This Android application allows users to search for stock symbols/tickers, view 
 - **Picasso & Glide:** Libraries used for efficient image loading and display, handling various image-related tasks.
 - **Volley:** Employed for network operations, including making API calls and handling responses.
 - **Node.js & Express:** Backend technologies used to create and manage API endpoints and handle server-side logic.
-  
-## Demo Video
 
-[Watch the demo video](https://www.youtube.com/watch?v=154yEzqdS1I)
